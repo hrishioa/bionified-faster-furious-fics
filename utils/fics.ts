@@ -9,13 +9,18 @@ dotenv.config({ path: __dirname + '../.env' });
 
 console.log('Loaded fic script.');
 
+export const ALLOWED_COOKIES = ['_otwarchive_session', 'user_credentials'];
+
 export function getWorkId(queryToken: string) {
   const workId = parseInt(queryToken);
   if (!isNaN(workId)) return workId;
   else return null;
 }
 
-async function authenticate(): Promise<AxiosInstance | null> {
+async function authenticate(): Promise<{
+  client: AxiosInstance;
+  cookieJar: ToughCookie.CookieJar;
+} | null> {
   console.time('Authenticated             ');
   try {
     const jar = new ToughCookie.CookieJar();
@@ -39,8 +44,6 @@ async function authenticate(): Promise<AxiosInstance | null> {
       'user[login]': process.env.AO3_USERNAME as string,
       'user[password]': process.env.AO3_PASSWORD as string,
     });
-
-    console.log('Authenticating with ', params);
 
     console.time('Logging in                ');
     const { status: authStatus, request: authRequest } = await client.post(
@@ -78,7 +81,10 @@ async function authenticate(): Promise<AxiosInstance | null> {
     console.timeEnd('Checking Login Status     ');
     console.timeEnd('Authenticated             ');
 
-    return client;
+    return {
+      client,
+      cookieJar: jar,
+    };
   } catch (err) {
     console.error('Error authenticating - ', err);
     return null;
@@ -87,13 +93,25 @@ async function authenticate(): Promise<AxiosInstance | null> {
 
 export async function loadWork(
   workId: number,
-  client?: AxiosInstance,
-): Promise<AO3Work | null> {
-  if (!client) {
-    const newClient = await authenticate();
-    if (!newClient) return null;
-    client = newClient;
+  cookies: string[],
+): Promise<{ work: AO3Work; cookies: string[] } | null> {
+  let client: AxiosInstance | null = null;
+  let cookieJar = new ToughCookie.CookieJar();
+
+  if (cookies.length) {
+    console.log('Cookies found, recreating jar');
+
+    cookies.map(cookie => cookieJar.setCookieSync(cookie, 'https://archiveofourown.org/'));
+
+    client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
+  } else {
+    const authData = await authenticate();
+    client = authData?.client || null;
+    if(authData?.cookieJar)
+      cookieJar = authData?.cookieJar;
   }
+
+  if (!client) return null;
 
   console.time(`Loading fic ${workId}`);
   const { data: workData, status: workStatus } = await client
@@ -118,7 +136,10 @@ export async function loadWork(
     return null;
   }
 
-  return processWork(workDOM, workId);
+  return {
+    work: processWork(workDOM, workId),
+    cookies: await cookieJar.getSetCookieStrings('https://archiveofourown.org/'),
+  };
 }
 
 function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
