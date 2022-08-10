@@ -181,7 +181,7 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
       workStats,
     },
     chapters,
-    metaDl,
+    metaDlHTML: metaDl.html() || '',
   };
 }
 
@@ -271,11 +271,11 @@ function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
       id,
       count,
     },
-    prefaceDiv,
-    summaryDiv,
-    startNotesDiv,
-    endNotesDiv,
-    titleH3,
-    textDiv,
+    prefaceDivHTML: prefaceDiv.html() || '',
+    summaryDivHTML: summaryDiv.html() || '',
+    startNotesDivHTML: startNotesDiv.html() || '',
+    endNotesDivHTML: endNotesDiv.html() || '',
+    titleH3HTML: titleH3.html() || '',
+    textDivHTML: textDiv.html() || '',
   };
 }

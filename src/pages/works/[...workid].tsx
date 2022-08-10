@@ -5,7 +5,7 @@ import { AO3Work, WorkMeta } from 'utils/types';
 import { createGzip } from 'zlib';
 
 const WorkPage = (props: {
-  work: WorkMeta | null;
+  work: AO3Work | null;
   cookies: string[] | null;
 }) => {
   const { work, cookies } = props;
@@ -19,7 +19,9 @@ const WorkPage = (props: {
     }
   });
 
-  return <div>Hello there - {JSON.stringify(work)}</div>;
+  return <div>
+  <div dangerouslySetInnerHTML={{ __html: work?.chapters[0].textDivHTML }} />
+  </div>;
 };
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
@@ -42,7 +44,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const workData = await loadWork(workId, allowedCookies);
     return {
       props: {
-        work: workData?.work.meta.workMeta || null,
+        work: workData?.work || null,
         cookies: workData?.cookies || null,
       },
     };

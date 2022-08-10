@@ -1,15 +1,17 @@
 import * as cheerio from 'cheerio';
 
+export type WorkInfo = {
+  id: number;
+  title: string;
+  authenticityToken: string;
+  workMeta: WorkMeta;
+  workStats: WorkStats;
+};
+
 export type AO3Work = {
-  meta: {
-    id: number;
-    title: string;
-    authenticityToken: string;
-    workMeta: WorkMeta;
-    workStats: WorkStats;
-  };
+  meta: WorkInfo;
   chapters: AO3Chapter[];
-  metaDl: cheerio.Cheerio<cheerio.Element>;
+  metaDlHTML: string;
 };
 
 export type AO3Chapter = {
@@ -19,12 +21,12 @@ export type AO3Chapter = {
     id: string;
     count: number;
   };
-  prefaceDiv: cheerio.Cheerio<cheerio.Element>;
-  summaryDiv: cheerio.Cheerio<cheerio.Element>;
-  startNotesDiv: cheerio.Cheerio<cheerio.Element>;
-  endNotesDiv: cheerio.Cheerio<cheerio.Element>;
-  titleH3: cheerio.Cheerio<cheerio.Element>;
-  textDiv: cheerio.Cheerio<cheerio.Element>;
+  prefaceDivHTML: string;
+  summaryDivHTML: string;
+  startNotesDivHTML: string;
+  endNotesDivHTML: string;
+  titleH3HTML: string;
+  textDivHTML: string;
 };
 
 export type workTags = {
