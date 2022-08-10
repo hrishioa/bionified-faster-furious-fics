@@ -15,7 +15,7 @@ const WorkPage = (props: {
       cookies.map(
         (cookie) => (document.cookie = cookie.replace(/HttpOnly/i, '')),
       );
-      console.log('Set cookies - ',cookies);
+      console.log('Set cookies - ', cookies);
     }
   });
 

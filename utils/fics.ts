@@ -94,21 +94,21 @@ async function authenticate(): Promise<{
 export async function loadWork(
   workId: number,
   cookies: string[],
+  singleRetry?: boolean,
 ): Promise<{ work: AO3Work; cookies: string[] } | null> {
   let client: AxiosInstance | null = null;
   let cookieJar = new ToughCookie.CookieJar();
 
   if (cookies.length) {
-    console.log('Cookies found, recreating jar');
-
-    cookies.map(cookie => cookieJar.setCookieSync(cookie, 'https://archiveofourown.org/'));
+    cookies.map((cookie) =>
+      cookieJar.setCookieSync(cookie, 'https://archiveofourown.org/'),
+    );
 
     client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
   } else {
     const authData = await authenticate();
     client = authData?.client || null;
-    if(authData?.cookieJar)
-      cookieJar = authData?.cookieJar;
+    if (authData?.cookieJar) cookieJar = authData?.cookieJar;
   }
 
   if (!client) return null;
@@ -125,7 +125,11 @@ export async function loadWork(
     });
   console.timeEnd(`Loading fic ${workId}`);
 
-  if (workStatus !== 200) return null;
+  if (workStatus !== 200) {
+    if (cookies && !singleRetry) {
+      return loadWork(workId, cookies, true);
+    } else return null;
+  }
 
   const workDOM = cheerio.load(workData);
 
@@ -138,7 +142,9 @@ export async function loadWork(
 
   return {
     work: processWork(workDOM, workId),
-    cookies: await cookieJar.getSetCookieStrings('https://archiveofourown.org/'),
+    cookies: await cookieJar.getSetCookieStrings(
+      'https://archiveofourown.org/',
+    ),
   };
 }
 
