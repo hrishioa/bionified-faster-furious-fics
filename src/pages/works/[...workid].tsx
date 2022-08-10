@@ -1,5 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 import React, { useEffect } from 'react';
+import { bioHTML } from 'utils/bionify';
 import { ALLOWED_COOKIES, getWorkId, loadWork } from 'utils/fics';
 import { AO3Work, WorkMeta } from 'utils/types';
 import { createGzip } from 'zlib';
@@ -15,12 +16,11 @@ const WorkPage = (props: {
       cookies.map(
         (cookie) => (document.cookie = cookie.replace(/HttpOnly/i, '')),
       );
-      console.log('Set cookies - ', cookies);
     }
   });
 
-  return <div>
-  <div dangerouslySetInnerHTML={{ __html: work?.chapters[0].textDivHTML }} />
+  return <div className='chapter_text'>
+  <div dangerouslySetInnerHTML={{ __html: bioHTML(work?.chapters[0].textDivHTML || '')}} />
   </div>;
 };
 
