@@ -53,11 +53,11 @@ a {
 
 @media(max-width: 900px) {
   body {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
   }
 
   .chapter_text {
-    max-width: 90vw;
+    max-width: 80vw;
   }
 }
 
