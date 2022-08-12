@@ -47,8 +47,8 @@ a {
 }
 
 .bio-rest {
-  color: hsl(282deg 22% 56%);
-  /* opacity: 0.5; */
+  /* color: hsl(282deg 22% 50%); */
+  opacity: 0.6;
 }
 
 @media(max-width: 900px) {
