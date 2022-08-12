@@ -1,9 +1,9 @@
+import { Chapter } from 'components/Chapter';
 import { GetServerSidePropsContext } from 'next';
 import React, { useEffect } from 'react';
 import { bioHTML } from 'utils/bionify';
 import { ALLOWED_COOKIES, getWorkId, loadWork } from 'utils/fics';
 import { AO3Work, WorkMeta } from 'utils/types';
-import { createGzip } from 'zlib';
 
 const WorkPage = (props: {
   work: AO3Work | null;
@@ -19,8 +19,12 @@ const WorkPage = (props: {
     }
   });
 
-  return <div className='chapter_text'>
-  <div dangerouslySetInnerHTML={{ __html: bioHTML(work?.chapters[0].textDivHTML || '')}} />
+  return <div>
+    {
+      work?.chapters.map(chapter => <Chapter chapter={chapter} key={chapter.meta.id}/>)
+    }
+
+  {/* <div dangerouslySetInnerHTML={{ __html: bioHTML(work?.chapters[0].textDivHTML || '')}} /> */}
   </div>;
 };
 
