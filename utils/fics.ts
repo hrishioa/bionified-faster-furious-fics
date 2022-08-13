@@ -7,8 +7,6 @@ import { AO3Chapter, AO3Work, WorkMeta, WorkStats, workTags } from './types';
 
 dotenv.config({ path: __dirname + '../.env' });
 
-console.log('Loaded fic script.');
-
 export const ALLOWED_COOKIES = ['_otwarchive_session', 'user_credentials'];
 
 function getTimeTag() {
@@ -162,7 +160,7 @@ export async function loadWork(
 
   const heading = workDOM('h2.heading').text();
 
-  console.log('Work heading - ',heading);
+  const processedWork = processWork(workDOM, workId);
 
   if (heading.toLowerCase().includes('error 404')) {
     console.error('Could not find fic');
@@ -170,7 +168,7 @@ export async function loadWork(
   }
 
   return {
-    work: processWork(workDOM, workId),
+    work: processedWork,
     cookies: await cookieJar.getSetCookieStrings(
       'https://archiveofourown.org/',
     ),
@@ -187,6 +185,10 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
     const chapterDiv = workDOM(`div#chapter-${chapterId}`);
     if (!chapterDiv.length) continue;
     chapters.push(loadChapter(chapterDiv));
+  }
+
+  if(chapters.length === 0) {
+    chapters.push(loadChapter(workDOM('div#workskin')));
   }
 
   const authenticityToken = workDOM(
@@ -279,14 +281,24 @@ function cleanString(text: string): string {
 }
 
 function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
-  const prefaceDiv = chapterDiv.find('div.chapter.preface.group');
-  const summaryDiv = chapterDiv.find('div#summary');
-  const startNotesDiv = chapterDiv.find('div#notes');
-  const endNotesDiv = chapterDiv.find('div#chapter_2_endnotes');
-  const titleH3 = chapterDiv.find('h3.title');
-  const textDiv = chapterDiv.find('div[role=article]');
+  let prefaceDiv = chapterDiv.find('div.preface.module.group');
+  if(!prefaceDiv.length)
+    prefaceDiv = chapterDiv.find('div.preface.group');
+  let summaryDiv = chapterDiv.find('div#summary');
+  if(!summaryDiv.length)
+    summaryDiv = chapterDiv.find('div.summary.module');
+  let startNotesDiv = chapterDiv.find('div#notes');
+  if(!startNotesDiv.length)
+    startNotesDiv = chapterDiv.find('div.notes');
 
   const count = parseInt((chapterDiv.attr('id') as string).split('-')[1]);
+
+  const endNotesDiv = !isNaN(count) && chapterDiv.find(`div#chapter_${count}_endnotes`) || null;
+  let titleH3 = chapterDiv.find('h3.title');
+  if(!titleH3.length)
+    titleH3 = chapterDiv.find('h2.title');
+  const textDiv = chapterDiv.find('div[role=article]');
+
   const chapterRelLink =
     chapterDiv.find('h3.title').find('a').attr('href') || '';
   const id = chapterRelLink.split('/')[chapterRelLink.split('/').length - 1];
@@ -302,8 +314,8 @@ function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
     },
     prefaceDivHTML: prefaceDiv.html() || '',
     summaryDivHTML: summaryDiv.html() || '',
-    startNotesDivHTML: startNotesDiv.html() || '',
-    endNotesDivHTML: endNotesDiv.html() || '',
+    startNotesDivHTML: startNotesDiv?.html() || '',
+    endNotesDivHTML: endNotesDiv && endNotesDiv.length && endNotesDiv.html() || '',
     titleH3HTML: titleH3.html() || '',
     textDivHTML: textDiv.html() || '',
   };
