@@ -41,21 +41,29 @@ const groupNameStyle = {
 
 const actions = [
   {
-    id: 'docsAction',
-    name: 'Docs',
-    shortcut: ['g', 'd'],
-    keywords: 'help',
-    section: 'Navigation',
-    perform: () => console.log('Docs'),
-  },
-  {
-    id: 'contactAction',
-    name: 'Contact',
+    id: 'catAction',
+    name: 'Why did you wake me?',
     shortcut: ['c'],
-    keywords: 'email hello',
-    section: 'Navigation',
-    perform: () => window.open('mailto:timchang@hey.com', '_blank'),
-  },
+    keywords: 'cat',
+    section: 'Functions',
+    perform: () => window.open('https://www.youtube.com/watch?v=dEFGfu_tHsA')
+  }
+  // {
+  //   id: 'docsAction',
+  //   name: 'Docs',
+  //   shortcut: ['g', 'd'],
+  //   keywords: 'help',
+  //   section: 'Navigation',
+  //   perform: () => console.log('Docs'),
+  // },
+  // {
+  //   id: 'contactAction',
+  //   name: 'Contact',
+  //   shortcut: ['c'],
+  //   keywords: 'email hello',
+  //   section: 'Navigation',
+  //   perform: () => window.open('mailto:timchang@hey.com', '_blank'),
+  // },
 ];
 
 function RenderResults() {
