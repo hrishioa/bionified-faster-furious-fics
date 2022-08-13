@@ -20,8 +20,8 @@ const WorkPage = (props: {
       `Loaded ${work?.chapters.length} chapters for work ${work?.meta.title}`,
     );
 
-    if(selectedChapter) {
-      console.log('Turning to chapter ',selectedChapter);
+    if (selectedChapter) {
+      console.log('Turning to chapter ', selectedChapter);
     }
 
     console.log('Checking and loading cookies...');
@@ -35,7 +35,13 @@ const WorkPage = (props: {
   return (
     <div>
       {work?.chapters.map((chapter) => (
-        <Chapter chapter={chapter} key={chapter.meta.id} selected={selectedChapter && chapter.meta.id === selectedChapter || false}/>
+        <Chapter
+          chapter={chapter}
+          key={chapter.meta.id}
+          selected={
+            (selectedChapter && chapter.meta.id === selectedChapter) || false
+          }
+        />
       ))}
 
       {/* <div dangerouslySetInnerHTML={{ __html: bioHTML(work?.chapters[0].textDivHTML || '')}} /> */}
@@ -81,7 +87,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       props: {
         work: workData?.work || null,
         cookies: workData?.cookies || null,
-        selectedChapter
+        selectedChapter,
       },
     };
   } else {

@@ -30,27 +30,34 @@ export const Chapter = ({ chapter, selected }: ChapterProps) => {
   }
 
   function highlightSelectedTags(tags: string[]) {
-    document.querySelectorAll('.text-selected')?.forEach(elem => elem.classList.remove('text-selected'));
+    document
+      .querySelectorAll('.text-selected')
+      ?.forEach((elem) => elem.classList.remove('text-selected'));
 
-    tags.forEach(tag => {
-      document.querySelectorAll(`.${tag}`)?.forEach(elem => elem.classList.add('text-selected'));
-    })
+    tags.forEach((tag) => {
+      document
+        .querySelectorAll(`.${tag}`)
+        ?.forEach((elem) => elem.classList.add('text-selected'));
+    });
   }
 
   function highlightSelection(selectionHTML: string) {
     highlightSelectedTags(getSelectedTags(selectionHTML) || []);
   }
 
-  function handleMouseUp(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  function handleMouseTouchEnd(
+    event:
+      | React.MouseEvent<HTMLDivElement, MouseEvent>
+      | React.TouchEvent<HTMLDivElement>,
+  ) {
     const selection = window.getSelection();
 
-    if(!selection)
-      return highlightSelection('');
+    if (!selection) return highlightSelection('');
 
     const selectionContainer = document.createElement('div');
 
-    if(selection.rangeCount)
-      for(let i=0;i<selection.rangeCount;i++)
+    if (selection.rangeCount)
+      for (let i = 0; i < selection.rangeCount; i++)
         selectionContainer.appendChild(selection.getRangeAt(i).cloneContents());
 
     highlightSelection(selectionContainer.innerHTML);
@@ -68,7 +75,8 @@ export const Chapter = ({ chapter, selected }: ChapterProps) => {
       </div>
       <div
         className="chapter_text"
-        onMouseUp={handleMouseUp}
+        onMouseUp={handleMouseTouchEnd}
+        onTouchEnd={handleMouseTouchEnd}
         dangerouslySetInnerHTML={{
           __html: (showingChapterContent && safeChapterContent) || '',
         }}
