@@ -43,8 +43,6 @@ const WorkPage = (props: {
           }
         />
       ))}
-
-      {/* <div dangerouslySetInnerHTML={{ __html: bioHTML(work?.chapters[0].textDivHTML || '')}} /> */}
     </div>
   );
 };
