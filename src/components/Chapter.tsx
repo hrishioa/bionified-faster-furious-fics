@@ -67,7 +67,7 @@ export const Chapter = ({ chapter, activeChapterNumber }: ChapterProps) => {
     <>
       <div
         ref={titleDivRef}
-        className={`chapter_title chapter_${chapter.meta.count}`}
+        className='chapter_title'
         onClick={() => showChapterContent((curVal) => !curVal)}
       >
         {chapter.meta.title}

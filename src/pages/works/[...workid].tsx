@@ -1,5 +1,5 @@
 import { Chapter } from '@/components/Chapter';
-import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChapterInMenu';
+import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChaptersInMenu';
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React, { useEffect, useState } from 'react';
