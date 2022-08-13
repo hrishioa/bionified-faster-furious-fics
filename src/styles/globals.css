@@ -26,6 +26,12 @@ a {
   font-family: 'IBM Plex Serif'
 }
 
+.text-selected {
+  background-color: teal;
+  color: white;
+
+}
+
 .chapter_text {
   max-width: 65vw;
   margin: 0 auto;
@@ -48,6 +54,10 @@ a {
 .bio-rest {
   /* color: hsl(282deg 22% 50%); */
   opacity: 0.53;
+}
+
+.bio-rest.text-selected {
+  opacity: 1;
 }
 
 @media(max-width: 900px) {

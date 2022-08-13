@@ -7,6 +7,8 @@ type AlgoParameters = {
   restRatio: number;
 };
 
+let elementIdCounter = 0;
+
 const commonWords = [
   'the',
   'be',
@@ -81,7 +83,7 @@ function parseAlgoParameters(paramStr: string): AlgoParameters {
 }
 
 function bioWord(word: string, algoParameters: AlgoParameters) {
-  if (!word.length || word.search(/\w/g) === -1) return word;
+  if (!word.length || word.search(/\w/g) === -1) return bioRest(word);
 
   function isCommon(word: string) {
     return commonWords.indexOf(word) != -1;
@@ -92,7 +94,7 @@ function bioWord(word: string, algoParameters: AlgoParameters) {
   let numBold = 1;
 
   if (word.length <= 3 && algoParameters.exclude) {
-    if (isCommon(word)) return word;
+    if (isCommon(word)) return bioRest(word);
   }
 
   if (index < algoParameters.sizes.length) {
@@ -102,11 +104,15 @@ function bioWord(word: string, algoParameters: AlgoParameters) {
   }
 
   return (
-    '<span class="bio-emphasize">' +
-    word.slice(0, numBold) +
-    '</span>' +
-    '<span class="bio-rest">' +
-    word.slice(numBold) +
-    '</span>'
+    bioEmphasize(word.slice(0, numBold))+
+    bioRest(word.slice(numBold))
   );
+}
+
+function bioRest(text: string) {
+  return `<span class="bio-rest tp-${elementIdCounter++}">${text}</span>`
+}
+
+function bioEmphasize(text: string) {
+  return `<span class="bio-emphasize tp-${elementIdCounter++}">${text}</span>`
 }

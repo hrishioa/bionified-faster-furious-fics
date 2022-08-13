@@ -17,7 +17,6 @@ export const Chapter = ({ chapter, selected }: ChapterProps) => {
 
   useEffect(() => {
     if (selected) {
-      console.log('Scrolling into view for chapter ', chapter.meta.count);
       titleDivRef.current!.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
@@ -26,14 +25,53 @@ export const Chapter = ({ chapter, selected }: ChapterProps) => {
     }
   }, []);
 
+  function getSelectedTags(selectionHTML: string) {
+    return selectionHTML.match(/tp-[\d]+/g);
+  }
+
+  function highlightSelectedTags(tags: string[]) {
+    document.querySelectorAll('.text-selected')?.forEach(elem => elem.classList.remove('text-selected'));
+
+    tags.forEach(tag => {
+      document.querySelectorAll(`.${tag}`)?.forEach(elem => elem.classList.add('text-selected'));
+    })
+  }
+
+  function highlightSelection(selectionHTML: string) {
+    highlightSelectedTags(getSelectedTags(selectionHTML) || []);
+  }
+
+  function handleMouseUp(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    const selection = window.getSelection();
+
+    if(!selection)
+      return highlightSelection('');
+
+    const selectionContainer = document.createElement('div');
+
+    if(selection.rangeCount)
+      for(let i=0;i<selection.rangeCount;i++)
+        selectionContainer.appendChild(selection.getRangeAt(i).cloneContents());
+
+    highlightSelection(selectionContainer.innerHTML);
+    window.getSelection()?.removeAllRanges();
+  }
+
   return (
     <>
-      <div ref={titleDivRef} className="chapter_title" onClick={() => showChapterContent((curVal) => !curVal)}>
+      <div
+        ref={titleDivRef}
+        className="chapter_title"
+        onClick={() => showChapterContent((curVal) => !curVal)}
+      >
         {chapter.meta.title}
       </div>
       <div
         className="chapter_text"
-        dangerouslySetInnerHTML={{ __html: showingChapterContent && safeChapterContent || '' }}
+        onMouseUp={handleMouseUp}
+        dangerouslySetInnerHTML={{
+          __html: (showingChapterContent && safeChapterContent) || '',
+        }}
       />
     </>
   );
