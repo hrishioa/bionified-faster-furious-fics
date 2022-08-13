@@ -2,8 +2,18 @@ import type { AppProps } from 'next/app';
 import '@/styles/globals.css';
 import Script from 'next/script';
 import Head from 'next/head';
+import { DarkModeSwitch } from 'react-toggle-dark-mode';
+import { useEffect, useState } from 'react';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    if (document) {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  }, [theme]);
+
   return (
     <>
       <Script
@@ -22,6 +32,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>FuriousFics</title>
       </Head>
+      <div className="theme-switch-container">
+        <DarkModeSwitch
+          checked={theme === 'dark'}
+          onChange={() =>
+            setTheme((theme) => (theme === 'light' ? 'dark' : 'light'))
+          }
+          size={35}
+          // moonColor="var(--heading-color)"
+          // sunColor="var(--heading-color)"
+        />
+      </div>
       <Component {...pageProps} />
     </>
   );
