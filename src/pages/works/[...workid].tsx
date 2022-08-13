@@ -1,7 +1,8 @@
 import { Chapter } from '@/components/Chapter';
+import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChapterInMenu';
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ALLOWED_COOKIES, getWorkId, loadWork } from 'utils/fics';
 import { AO3Work } from 'utils/types';
 
@@ -12,16 +13,14 @@ const WorkPage = (props: {
 }) => {
   const { work, cookies, selectedChapter } = props;
 
+  const [activeChapter, setActiveChapter] = useState(selectedChapter);
+
   useEffect(() => {
     (window as any).work = work;
 
     console.log(
       `Loaded ${work?.chapters.length} chapters for work ${work?.meta.title}`,
     );
-
-    if (selectedChapter) {
-      console.log('Turning to chapter ', selectedChapter);
-    }
 
     console.log('Checking and loading cookies...');
     if (cookies) {
@@ -31,15 +30,29 @@ const WorkPage = (props: {
     }
   });
 
+  useEffect(() => {
+    console.log('active chapter changed in work to ', activeChapter);
+  }, [activeChapter]);
+
+  useRegisterChaptersInMenu(
+    work?.chapters.map((chapter) => ({
+      name: chapter.meta.title,
+      count: chapter.meta.count,
+      id: chapter.meta.id,
+    })) || [],
+    work?.chapters.length || 0,
+    setActiveChapter,
+  );
+
+  console.log('Setting up chapter menus');
+
   return (
     <div>
       {work?.chapters.map((chapter) => (
         <Chapter
           chapter={chapter}
           key={chapter.meta.id}
-          selected={
-            (selectedChapter && chapter.meta.id === selectedChapter) || false
-          }
+          activeChapterNumber={activeChapter}
         />
       ))}
     </div>

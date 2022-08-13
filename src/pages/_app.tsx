@@ -4,8 +4,8 @@ import Script from 'next/script';
 import Head from 'next/head';
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
 import { useEffect, useState } from 'react';
-import { CommandBar } from '@/components/CommandBar';
-import { CommandBarIcon } from '@/components/CommandBarIcon';
+import { CommandBar } from '@/components/CommandBar/CommandBar';
+import { CommandBarIcon } from '@/components/CommandBar/CommandBarIcon';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [theme, setTheme] = useState('light');
@@ -39,14 +39,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <DarkModeSwitch
             checked={theme === 'dark'}
             style={{
-              margin: '10px'
+              margin: '10px',
             }}
             onChange={() =>
               setTheme((theme) => (theme === 'light' ? 'dark' : 'light'))
             }
             size={50}
-            // moonColor="var(--heading-color)"
-            // sunColor="var(--heading-color)"
+            moonColor="var(--heading-color)"
+            sunColor="var(--heading-color)"
           />
           <CommandBarIcon />
         </div>

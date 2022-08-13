@@ -9,13 +9,20 @@ export const CommandBarIcon = () => {
   const { query } = useKBar();
 
   return (
-    <div style={{
-      margin: '10px'
-    }} onClick={() => query && query.toggle()}>
-      <Lottie animationData={CatRotate} loop={true} style={{
-        width: 50,
-        height: 50
-      }}/>
+    <div
+      style={{
+        margin: '10px',
+      }}
+      onClick={() => query && query.toggle()}
+    >
+      <Lottie
+        animationData={CatRotate}
+        loop={true}
+        style={{
+          width: 50,
+          height: 50,
+        }}
+      />
     </div>
-  )
-}
+  );
+};

@@ -5,10 +5,10 @@ import { AO3Chapter } from 'utils/types';
 
 type ChapterProps = {
   chapter: AO3Chapter;
-  selected: boolean;
+  activeChapterNumber: number | null;
 };
 
-export const Chapter = ({ chapter, selected }: ChapterProps) => {
+export const Chapter = ({ chapter, activeChapterNumber }: ChapterProps) => {
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
   const [showingChapterContent, showChapterContent] = useState(false);
   // TODO: Actually trying adding back in for safety
@@ -16,14 +16,17 @@ export const Chapter = ({ chapter, selected }: ChapterProps) => {
   const safeChapterContent = bioHTML(chapter.textDivHTML);
 
   useEffect(() => {
-    if (selected) {
-      titleDivRef.current!.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+    if (activeChapterNumber === chapter.meta.id) {
       showChapterContent(true);
+      window.setTimeout(() => {
+        if (titleDivRef.current)
+          titleDivRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+      }, 150);
     }
-  }, []);
+  }, [activeChapterNumber, titleDivRef, chapter.meta.id]);
 
   function getSelectedTags(selectionHTML: string) {
     return selectionHTML.match(/tp-[\d]+/g);
@@ -45,11 +48,7 @@ export const Chapter = ({ chapter, selected }: ChapterProps) => {
     highlightSelectedTags(getSelectedTags(selectionHTML) || []);
   }
 
-  function handleMouseTouchEnd(
-    event:
-      | React.MouseEvent<HTMLDivElement, MouseEvent>
-      | React.TouchEvent<HTMLDivElement>,
-  ) {
+  function handleMouseTouchEnd() {
     const selection = window.getSelection();
 
     if (!selection) return highlightSelection('');
@@ -68,7 +67,7 @@ export const Chapter = ({ chapter, selected }: ChapterProps) => {
     <>
       <div
         ref={titleDivRef}
-        className="chapter_title"
+        className={`chapter_title chapter_${chapter.meta.count}`}
         onClick={() => showChapterContent((curVal) => !curVal)}
       >
         {chapter.meta.title}
