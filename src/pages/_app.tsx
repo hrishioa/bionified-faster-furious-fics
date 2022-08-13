@@ -4,6 +4,7 @@ import Script from 'next/script';
 import Head from 'next/head';
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
 import { useEffect, useState } from 'react';
+import { CommandBar } from '@/components/CommandBar';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [theme, setTheme] = useState('light');
@@ -43,7 +44,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           // sunColor="var(--heading-color)"
         />
       </div>
-      <Component {...pageProps} />
+        <CommandBar>
+          <Component {...pageProps} />
+        </CommandBar>
     </>
   );
 }

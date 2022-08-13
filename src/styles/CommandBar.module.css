@@ -1,0 +1,133 @@
+* {
+  box-sizing: border-box;
+}
+
+._25B-i {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: 100vw;
+  height: 100vh;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
+._3bhQi {
+  padding: 0.5rem;
+  width: 640px;
+  transition: 0.1s ease 0s;
+  will-change: height;
+  position: relative;
+  border-style: solid;
+}
+
+._5GXTL {
+  border: none;
+  padding: 20px 10px;
+  margin: 0 0 8px;
+  background-color: transparent;
+  font-size: 18px;
+  width: 100%;
+  outline: 0;
+  font-family: inherit;
+}
+
+._aug0K {
+  display: flex;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-direction: column;
+  width: 100%;
+  transition: height 0.1s ease 0s;
+  will-change: height;
+}
+
+._2rx_z {
+  margin-top: 0.5rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+._1ODBS {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  height: 54px;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+._1iXa4 > kbd {
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 14px;
+  margin-right: 7px;
+  font-family: monospace;
+}
+
+._1iXa4 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+._3HGOz {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-left: 20px;
+}
+
+._3HGOz > svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+}
+
+._3zKBD {
+  margin: 5px 0 10px 10px;
+  font-size: 14px;
+}
+
+._313Gq {
+  position: absolute;
+  width: 100%;
+  height: 54px;
+  border-radius: 0.5rem;
+}
+
+._3X7BP {
+  max-width: 90%;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 16px;
+}
+
+._g_vwZ {
+  margin-top: 20px;
+}
+
+@media only screen and (max-width: 700px) {
+  ._3bhQi {
+    width: 90%;
+  }
+}

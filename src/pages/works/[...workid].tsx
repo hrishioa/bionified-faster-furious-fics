@@ -1,10 +1,9 @@
-import { Chapter } from 'components/Chapter';
+import { Chapter } from '@/components/Chapter';
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React, { useEffect } from 'react';
-import { bioHTML } from 'utils/bionify';
 import { ALLOWED_COOKIES, getWorkId, loadWork } from 'utils/fics';
-import { AO3Work, WorkMeta } from 'utils/types';
+import { AO3Work } from 'utils/types';
 
 const WorkPage = (props: {
   work: AO3Work | null;
