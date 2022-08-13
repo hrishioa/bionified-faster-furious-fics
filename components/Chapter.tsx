@@ -24,7 +24,7 @@ export const Chapter = ({ chapter, selected }: ChapterProps) => {
       });
       showChapterContent(true);
     }
-  });
+  }, []);
 
   return (
     <>
