@@ -18,7 +18,7 @@ export type AO3Chapter = {
   meta: {
     relativeLink: string;
     title: string;
-    id: string;
+    id: number;
     count: number;
   };
   prefaceDivHTML: string;

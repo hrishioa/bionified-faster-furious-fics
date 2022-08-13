@@ -9,13 +9,20 @@ import { AO3Work, WorkMeta } from 'utils/types';
 const WorkPage = (props: {
   work: AO3Work | null;
   cookies: string[] | null;
+  selectedChapter: number | null;
 }) => {
-  const { work, cookies } = props;
+  const { work, cookies, selectedChapter } = props;
 
   useEffect(() => {
+    (window as any).work = work;
+
     console.log(
       `Loaded ${work?.chapters.length} chapters for work ${work?.meta.title}`,
     );
+
+    if(selectedChapter) {
+      console.log('Turning to chapter ',selectedChapter);
+    }
 
     console.log('Checking and loading cookies...');
     if (cookies) {
@@ -28,7 +35,7 @@ const WorkPage = (props: {
   return (
     <div>
       {work?.chapters.map((chapter) => (
-        <Chapter chapter={chapter} key={chapter.meta.id} />
+        <Chapter chapter={chapter} key={chapter.meta.id} selected={selectedChapter && chapter.meta.id === selectedChapter || false}/>
       ))}
 
       {/* <div dangerouslySetInnerHTML={{ __html: bioHTML(work?.chapters[0].textDivHTML || '')}} /> */}
@@ -39,7 +46,6 @@ const WorkPage = (props: {
 function getChapterFromQuery(query: ParsedUrlQuery) {
   if (Array.isArray(query.workid)) {
     const cIndex = query.workid.findIndex((token) => token === 'chapters');
-    console.log('cIndex is ', cIndex, ', length is ',);
     if (
       cIndex !== -1 &&
       query.workid.length >= cIndex + 2 &&
@@ -57,12 +63,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     return acc;
   }, [] as string[]);
 
-  console.log(
-    'Got query - ',
-    ctx.query,
-    ' Chapter - ',
-    getChapterFromQuery(ctx.query),
-  );
+  const selectedChapter = getChapterFromQuery(ctx.query);
 
   if (ctx.query.workid) {
     const workId = getWorkId(
@@ -75,10 +76,12 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         },
       };
     const workData = await loadWork(workId, allowedCookies);
+
     return {
       props: {
         work: workData?.work || null,
         cookies: workData?.cookies || null,
+        selectedChapter
       },
     };
   } else {

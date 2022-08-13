@@ -297,7 +297,7 @@ function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
     meta: {
       relativeLink: chapterRelLink,
       title,
-      id,
+      id: parseInt(id),
       count,
     },
     prefaceDivHTML: prefaceDiv.html() || '',
