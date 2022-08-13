@@ -11,6 +11,10 @@ console.log('Loaded fic script.');
 
 export const ALLOWED_COOKIES = ['_otwarchive_session', 'user_credentials'];
 
+function getTimeTag() {
+  return (Math.random() + 1).toString(36).substring(7);
+}
+
 export function getWorkId(queryToken: string) {
   const workId = parseInt(queryToken);
   if (!isNaN(workId)) return workId;
@@ -21,18 +25,20 @@ async function authenticate(): Promise<{
   client: AxiosInstance;
   cookieJar: ToughCookie.CookieJar;
 } | null> {
-  console.time('Authenticated             ');
+  const runTag = getTimeTag();
+
+  console.time(`${runTag} - Authenticated             `);
   try {
     const jar = new ToughCookie.CookieJar();
     const client = ACSupport.wrapper(axios.create({ jar }));
 
-    console.time('Getting authenticity token');
+    console.time(`${runTag} - Getting authenticity token`);
     const { data: loginPageData, status: loginPageStatus } = await client.get(
       'https://archiveofourown.org/users/login',
     );
     const $ = cheerio.load(loginPageData);
     const authenticityToken = $('[name=authenticity_token]').val();
-    console.timeEnd('Getting authenticity token');
+    console.timeEnd(`${runTag} - Getting authenticity token`);
 
     if (!authenticityToken) {
       console.error('Authentication failure - ', loginPageStatus);
@@ -45,7 +51,7 @@ async function authenticate(): Promise<{
       'user[password]': process.env.AO3_PASSWORD as string,
     });
 
-    console.time('Logging in                ');
+    console.time(`${runTag} - Logging in                `);
     const { status: authStatus, request: authRequest } = await client.post(
       'https://archiveofourown.org/users/login',
       params,
@@ -67,19 +73,9 @@ async function authenticate(): Promise<{
       console.error('Credentials did not work.'); // Add more info here
       return null;
     }
-    console.timeEnd('Logging in                ');
+    console.timeEnd(`${runTag} - Logging in                `);
 
-    console.time('Checking Login Status     ');
-    const { request: checkRequest } = await client.get(
-      `https://archiveofourown.org/users/${process.env.AO3_USERNAME}/preferences`,
-    );
-
-    if (checkRequest._redirectable._redirectCount > 0) {
-      console.error('Failed to log in.');
-      return null;
-    }
-    console.timeEnd('Checking Login Status     ');
-    console.timeEnd('Authenticated             ');
+    console.timeEnd(`${runTag} - Authenticated             `);
 
     return {
       client,
@@ -91,9 +87,25 @@ async function authenticate(): Promise<{
   }
 }
 
+async function verifyAuth(client: AxiosInstance) {
+  console.log(`Veriyfing Login Status for ${process.env.AO3_USERNAME}     `);
+  const { request: checkRequest } = await client.get(
+    `https://archiveofourown.org/users/${process.env.AO3_USERNAME}/preferences`,
+  );
+
+  if (checkRequest._redirectable._redirectCount > 0) {
+    console.error('Failed to log in.');
+    return false;
+  }
+
+  console.log('Login verified');
+  return true;
+}
+
 export async function loadWork(
   workId: number,
   cookies: string[],
+  verifyLogin = false,
   singleRetry?: boolean,
 ): Promise<{ work: AO3Work; cookies: string[] } | null> {
   let client: AxiosInstance | null = null;
@@ -105,7 +117,16 @@ export async function loadWork(
     );
 
     client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
-  } else {
+
+    if(verifyLogin) {
+      console.log('Verifying login...');
+      if(!await verifyAuth(client))
+        cookies = [];
+    }
+  }
+
+  if(!cookies.length) {
+    console.log('Re-authenticating because cookies are missing...');
     const authData = await authenticate();
     client = authData?.client || null;
     if (authData?.cookieJar) cookieJar = authData?.cookieJar;
@@ -113,8 +134,10 @@ export async function loadWork(
 
   if (!client) return null;
 
-  console.time(`Loading fic ${workId}`);
-  const { data: workData, status: workStatus } = await client
+  const runTag = getTimeTag();
+
+  console.time(`${runTag} - Loading fic ${workId}`);
+  const { data: workData, status: workStatus, request: workRequest } = await client
     .get(
       `https://archiveofourown.org/works/${workId}?view_adult=true&view_full_work=true`,
     )
@@ -123,17 +146,23 @@ export async function loadWork(
       if (error.response) return error.response;
       else return null;
     });
-  console.timeEnd(`Loading fic ${workId}`);
+  console.timeEnd(`${runTag} - Loading fic ${workId}`);
 
-  if (workStatus !== 200) {
-    if (cookies && !singleRetry) {
-      return loadWork(workId, cookies, true);
-    } else return null;
+  if(workRequest._redirectable._redirectCount > 0 || workStatus !== 200) {
+    console.log('Work seems redirected, retrying...');
+    if(!singleRetry)
+      return loadWork(workId, cookies, true, true);
+    else {
+      console.log('Skipping because we already retried');
+      return null;
+    }
   }
 
   const workDOM = cheerio.load(workData);
 
   const heading = workDOM('h2.heading').text();
+
+  console.log('Work heading - ',heading);
 
   if (heading.toLowerCase().includes('error 404')) {
     console.error('Could not find fic');

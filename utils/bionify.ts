@@ -29,7 +29,7 @@ export function bioHTML(html: string, algoParameters?: AlgoParameters) {
   if (!algoParameters)
     algoParameters = parseAlgoParameters(defaultAlgoParameters);
 
-  const splitTextWithTags = decodeURIComponent(html)
+  const splitTextWithTags = html
     .replace(/\&nbsp\;/g, ' ')
     .split(/(<[^>]*>)/g);
 
