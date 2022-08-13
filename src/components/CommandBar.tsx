@@ -148,7 +148,7 @@ function RenderResults() {
   );
 }
 
-export const CommandBar = ({ children }: { children?: JSX.Element }) => {
+export const CommandBar = ({ children }: { children?: JSX.Element | JSX.Element[] }) => {
   return (
     <KBarProvider actions={actions}>
       <KBarPortal>

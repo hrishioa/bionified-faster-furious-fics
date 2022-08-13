@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
 import { useEffect, useState } from 'react';
 import { CommandBar } from '@/components/CommandBar';
+import { CommandBarIcon } from '@/components/CommandBarIcon';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [theme, setTheme] = useState('light');
@@ -33,20 +34,24 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>FuriousFics</title>
       </Head>
-      <div className="theme-switch-container">
-        <DarkModeSwitch
-          checked={theme === 'dark'}
-          onChange={() =>
-            setTheme((theme) => (theme === 'light' ? 'dark' : 'light'))
-          }
-          size={35}
-          // moonColor="var(--heading-color)"
-          // sunColor="var(--heading-color)"
-        />
-      </div>
-        <CommandBar>
-          <Component {...pageProps} />
-        </CommandBar>
+      <CommandBar>
+        <div className="theme-switch-container">
+          <DarkModeSwitch
+            checked={theme === 'dark'}
+            style={{
+              margin: '10px'
+            }}
+            onChange={() =>
+              setTheme((theme) => (theme === 'light' ? 'dark' : 'light'))
+            }
+            size={50}
+            // moonColor="var(--heading-color)"
+            // sunColor="var(--heading-color)"
+          />
+          <CommandBarIcon />
+        </div>
+        <Component {...pageProps} />
+      </CommandBar>
     </>
   );
 }

@@ -22,6 +22,8 @@ body {
 }
 
 .theme-switch-container {
+  display: flex;
+  justify-content: flex-end;
   margin: 20px;
 }
 
