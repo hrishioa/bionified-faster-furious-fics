@@ -27,7 +27,7 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
           });
       }, waitToScrollMs);
     }
-  }, [selected, showingChapterContent]);
+  }, [selected]);
 
   function getSelectedTags(selectionHTML: string) {
     return selectionHTML.match(/tp-[\d]+/g);
