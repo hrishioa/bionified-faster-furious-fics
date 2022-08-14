@@ -1,4 +1,4 @@
-import { Chapter } from '@/components/Chapter';
+import { MemoizedChapter } from '@/components/Chapter';
 import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChaptersInMenu';
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
@@ -49,10 +49,10 @@ const WorkPage = (props: {
   return (
     <div>
       {work?.chapters.map((chapter) => (
-        <Chapter
+        <MemoizedChapter
+          selected={activeChapter === chapter.meta.id}
           chapter={chapter}
           key={chapter.meta.id}
-          activeChapterNumber={activeChapter}
         />
       ))}
     </div>

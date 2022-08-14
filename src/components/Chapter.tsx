@@ -1,32 +1,33 @@
 import React, { Ref, useEffect, useRef, useState } from 'react';
 import { bioHTML } from 'utils/bionify';
 import { AO3Chapter } from 'utils/types';
-// import dompurify from 'dompurify';
 
 type ChapterProps = {
   chapter: AO3Chapter;
-  activeChapterNumber: number | null;
+  selected: boolean;
 };
 
-export const Chapter = ({ chapter, activeChapterNumber }: ChapterProps) => {
+const Chapter = ({ chapter, selected }: ChapterProps) => {
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
   const [showingChapterContent, showChapterContent] = useState(false);
-  // TODO: Actually trying adding back in for safety
-  // const safeChapterContent = dompurify.sanitize(chapter.textDivHTML);
   const safeChapterContent = bioHTML(chapter.textDivHTML);
 
   useEffect(() => {
-    if (activeChapterNumber === chapter.meta.id) {
-      showChapterContent(true);
+    if(selected) {
+      let waitToScrollMs = 0;
+      if(!showingChapterContent) {
+        showChapterContent(true);
+        waitToScrollMs = 150;
+      }
       window.setTimeout(() => {
         if (titleDivRef.current)
           titleDivRef.current.scrollIntoView({
             behavior: 'smooth',
             block: 'start',
           });
-      }, 150);
+      }, waitToScrollMs);
     }
-  }, [activeChapterNumber, titleDivRef, chapter.meta.id]);
+  }, [selected, showingChapterContent]);
 
   function getSelectedTags(selectionHTML: string) {
     return selectionHTML.match(/tp-[\d]+/g);
@@ -83,3 +84,5 @@ export const Chapter = ({ chapter, activeChapterNumber }: ChapterProps) => {
     </>
   );
 };
+
+export const MemoizedChapter = React.memo(Chapter);
