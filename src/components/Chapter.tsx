@@ -21,7 +21,10 @@ type ChapterProps = {
 const Chapter = ({ chapter, selected }: ChapterProps) => {
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
   const [showingChapterContent, showChapterContent] = useState(false);
-  const safeChapterContent = bioHTML(chapter.textDivHTML, {prefix: String(chapter.meta.count), startId:chapter.meta.id});
+  const safeChapterContent = bioHTML(chapter.textDivHTML, {
+    prefix: String(chapter.meta.count),
+    startId: chapter.meta.id,
+  });
   const [selectionToolbarConfig, setSelectionToolbarConfig] = useState({
     positionStyle: { display: 'none' },
   } as SelectionToolbarProps);
@@ -59,7 +62,8 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
 
     tags.forEach((tag) => {
       document
-        .querySelectorAll(`.${tag}`)
+        .querySelector(`.chapter-${chapter.meta.id}`)
+        ?.querySelectorAll(`.${tag}`)
         ?.forEach((elem) => elem.classList.add('text-selected'));
     });
   }
@@ -96,6 +100,8 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
         positionStyle: toolbarConfig,
       });
     }
+
+    window.getSelection()?.removeAllRanges();
   }
 
   return (
@@ -108,7 +114,7 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
         {chapter.meta.title}
       </div>
       <div
-        className="chapter_text"
+        className={`chapter_text chapter-${chapter.meta.id}`}
         onMouseUp={handleMouseTouchEnd}
         onTouchEnd={handleMouseTouchEnd}
         dangerouslySetInnerHTML={{

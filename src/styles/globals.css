@@ -26,7 +26,7 @@
   --heading-color: white;
   --cb-foreground: rgba(252 252 252 / 0.9);
   --cb-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
-  --rest-color: hsl(0deg 0% 50%);
+  --rest-color: hsl(0deg 0% 70%);
   --cb-overlay-color: rgba(0, 0, 0, .5);
   --cb-transparent-background: rgba(84, 84, 84, 0.45);
   --cb-placeholder-color: rgb(153, 153, 153);
@@ -36,14 +36,14 @@
 
 [data-theme="blue"] {
   --body-bg-color: rgb(0, 30, 60);
-  --text-color: hsl(210deg 13% 80%);
+  --text-color: hsl(210deg 13% 90%);
   --cb-background: hsl(214deg 17% 26%);
   --heading-color: white;
   --cb-a1: rgb(53 53 54);
   --cb-a2: rgba(255 255 255 / 0.1);
   --cb-foreground: rgba(252 252 252 / 0.9);
   --cb-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
-  --rest-color: hsl(210deg 16% 49%);
+  --rest-color: hsl(210deg 16% 66%);
   --cb-overlay-color: rgba(0, 0, 0, .5);
   --cb-transparent-background: rgba(84, 84, 84, 0.45);
   --cb-placeholder-color: rgb(153, 153, 153);
