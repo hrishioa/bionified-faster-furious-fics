@@ -1,11 +1,15 @@
 import type { AppProps } from 'next/app';
-import '@/styles/globals.css';
 import Script from 'next/script';
 import Head from 'next/head';
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
 import { useEffect, useState } from 'react';
 import { CommandBar } from '@/components/CommandBar/CommandBar';
 import { CommandBarIcon } from '@/components/CommandBar/CommandBarIcon';
+
+import '@/styles/globals.css';
+import '@/styles/commandbar.css';
+import '@/styles/chapters.css';
+
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [theme, setTheme] = useState('light');

@@ -13,7 +13,11 @@ const WorkPage = (props: {
 }) => {
   const { work, cookies, selectedChapter } = props;
 
-  const [activeChapter, setActiveChapter] = useState(selectedChapter);
+  const [activeChapter, setActiveChapter] = useState(null as number | null);
+
+  useEffect(() => {
+    setActiveChapter(selectedChapter);
+  }, []);
 
   useEffect(() => {
     (window as any).work = work;
