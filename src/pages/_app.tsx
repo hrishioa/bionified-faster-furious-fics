@@ -10,7 +10,6 @@ import '@/styles/globals.css';
 import '@/styles/commandbar.css';
 import '@/styles/chapters.css';
 
-
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [theme, setTheme] = useState('light');
 

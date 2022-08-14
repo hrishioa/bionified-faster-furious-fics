@@ -13,9 +13,9 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
   const safeChapterContent = bioHTML(chapter.textDivHTML);
 
   useEffect(() => {
-    if(selected) {
+    if (selected) {
       let waitToScrollMs = 0;
-      if(!showingChapterContent) {
+      if (!showingChapterContent) {
         showChapterContent(true);
         waitToScrollMs = 150;
       }
@@ -68,7 +68,7 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
     <>
       <div
         ref={titleDivRef}
-        className='chapter_title'
+        className="chapter_title"
         onClick={() => showChapterContent((curVal) => !curVal)}
       >
         {chapter.meta.title}

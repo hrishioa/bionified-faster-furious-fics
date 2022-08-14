@@ -90,29 +90,16 @@ const ComplexResultItem = (
   }, [action.ancestors, currentRootActionId]);
 
   return (
-    <div
-      ref={ref}
-      className={`cb-item ${active ? 'active' : ''}`}
-    >
-      <div
-        className="cb-item-label"
-      >
+    <div ref={ref} className={`cb-item ${active ? 'active' : ''}`}>
+      <div className="cb-item-label">
         {action.icon && action.icon}
         <div className="cb-item-label-container">
           <div>
             {ancestors.length > 0 &&
               ancestors.map((ancestor) => (
                 <React.Fragment key={ancestor.id}>
-                  <span
-                    className="cb-item-ancestor"
-                  >
-                    {ancestor.name}
-                  </span>
-                  <span
-                    className="cb-breadcrumb-arrow"
-                  >
-                    &rsaquo;
-                  </span>
+                  <span className="cb-item-ancestor">{ancestor.name}</span>
+                  <span className="cb-breadcrumb-arrow">&rsaquo;</span>
                 </React.Fragment>
               ))}
             <span>{action.name}</span>
@@ -128,10 +115,7 @@ const ComplexResultItem = (
           style={{ display: 'grid', gridAutoFlow: 'column', gap: '4px' }}
         >
           {action.shortcut.map((sc) => (
-            <kbd
-              key={sc}
-              className="cb-item-shortcut"
-            >
+            <kbd key={sc} className="cb-item-shortcut">
               {sc}
             </kbd>
           ))}
