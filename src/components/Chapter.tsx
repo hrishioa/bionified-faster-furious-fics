@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { CSSProperties, Ref, useEffect, useRef, useState } from 'react';
 import { bioHTML } from 'utils/bionify';
 import { getToolbarPosition } from 'utils/selection';
@@ -121,6 +122,25 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
           __html: (showingChapterContent && safeChapterContent) || '',
         }}
       />
+      {showingChapterContent && <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '30px 0'
+        }}
+      >
+        <Image
+          src="/curlydivider.svg"
+          alt="Divider"
+          width="500"
+          height="100"
+          style={{
+            maxHeight: '50px',
+            margin: 'auto 0',
+          }}
+        />
+      </div> || null}
+
       {selectionToolbarConfig ? (
         <SelectionToolbar {...selectionToolbarConfig} />
       ) : null}
