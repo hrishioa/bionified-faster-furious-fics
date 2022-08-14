@@ -1,6 +1,17 @@
-import React, { Ref, useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, Ref, useEffect, useRef, useState } from 'react';
 import { bioHTML } from 'utils/bionify';
-import { AO3Chapter } from 'utils/types';
+import { getToolbarPosition } from 'utils/selection';
+import { AO3Chapter, ToolbarPosition } from 'utils/types';
+
+type SelectionToolbarProps = {
+  positionStyle: ToolbarPosition;
+};
+
+const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
+  positionStyle,
+}) => {
+  return <div className="selection-container" style={positionStyle}></div>;
+};
 
 type ChapterProps = {
   chapter: AO3Chapter;
@@ -10,7 +21,11 @@ type ChapterProps = {
 const Chapter = ({ chapter, selected }: ChapterProps) => {
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
   const [showingChapterContent, showChapterContent] = useState(false);
-  const safeChapterContent = bioHTML(chapter.textDivHTML);
+  const safeChapterContent = bioHTML(chapter.textDivHTML, {prefix: String(chapter.meta.count), startId:chapter.meta.id});
+  const [selectionToolbarConfig, setSelectionToolbarConfig] = useState({
+    positionStyle: { display: 'none' },
+  } as SelectionToolbarProps);
+  const [selectedTags, setSelectedTags] = useState([] as string[]);
 
   useEffect(() => {
     if (selected) {
@@ -29,8 +44,12 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
     }
   }, [selected]);
 
+  useEffect(() => {
+    highlightSelectedTags(selectedTags);
+  }, [selectedTags]);
+
   function getSelectedTags(selectionHTML: string) {
-    return selectionHTML.match(/tp-[\d]+/g);
+    return selectionHTML.match(/tp-[\d]+-[\d]+/g);
   }
 
   function highlightSelectedTags(tags: string[]) {
@@ -46,13 +65,18 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
   }
 
   function highlightSelection(selectionHTML: string) {
-    highlightSelectedTags(getSelectedTags(selectionHTML) || []);
+    setSelectedTags(getSelectedTags(selectionHTML) || []);
+    if (!selectionHTML.length)
+      setSelectionToolbarConfig({ positionStyle: { display: 'none' } });
   }
 
   function handleMouseTouchEnd() {
     const selection = window.getSelection();
 
-    if (!selection) return highlightSelection('');
+    if (!selection) {
+      setSelectionToolbarConfig({ positionStyle: { display: 'none' } });
+      return highlightSelection('');
+    }
 
     const selectionContainer = document.createElement('div');
 
@@ -61,7 +85,17 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
         selectionContainer.appendChild(selection.getRangeAt(i).cloneContents());
 
     highlightSelection(selectionContainer.innerHTML);
-    window.getSelection()?.removeAllRanges();
+
+    const toolbarConfig = getToolbarPosition(selection, window, document);
+
+    if (!toolbarConfig) {
+      setSelectionToolbarConfig({ positionStyle: { display: 'none' } });
+    } else {
+      console.log('Showing toolbar');
+      setSelectionToolbarConfig({
+        positionStyle: toolbarConfig,
+      });
+    }
   }
 
   return (
@@ -81,6 +115,9 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
           __html: (showingChapterContent && safeChapterContent) || '',
         }}
       />
+      {selectionToolbarConfig ? (
+        <SelectionToolbar {...selectionToolbarConfig} />
+      ) : null}
     </>
   );
 };

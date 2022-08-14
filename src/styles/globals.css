@@ -77,6 +77,11 @@ a {
   box-sizing: border-box;
 }
 
+.selection-container {
+  position: absolute;
+  background-color: hsl(11deg 100% 42% / 75%);
+}
+
 @media(max-width: 900px) {
   body {
     font-size: 0.7rem;
@@ -86,14 +91,3 @@ a {
     max-width: 80vw;
   }
 }
-
-/*
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
-} */

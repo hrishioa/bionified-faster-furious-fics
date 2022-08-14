@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio';
+import { CSSProperties } from 'react';
 
 export type WorkInfo = {
   id: number;
@@ -7,6 +8,10 @@ export type WorkInfo = {
   workMeta: WorkMeta;
   workStats: WorkStats;
 };
+
+export type ToolbarPosition = Partial<
+Pick<CSSProperties, 'top' | 'left' | 'right' | 'height' | 'width' | 'display'>
+>;
 
 export type AO3Work = {
   meta: WorkInfo;

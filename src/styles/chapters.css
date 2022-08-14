@@ -2,8 +2,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative&display=swap');
 
-
-
 .chapter_title {
   max-width: 65vw;
   margin: 30px auto;
@@ -25,6 +23,11 @@
   font-size: 20px;
   line-height: 1.7;
   font-family: 'IBM Plex Serif'
+}
+
+.chapter_text::selection,.bio-emphasize::selection,.bio-rest::selection {
+  background: var(--highlight-background);
+  color: var(--highlight-text-color) !important;
 }
 
 .landmark.heading {
