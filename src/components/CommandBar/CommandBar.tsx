@@ -11,28 +11,7 @@ import {
   ActionImpl,
 } from 'kbar';
 
-const searchStyle = {
-  padding: '12px 16px',
-  fontSize: '16px',
-  width: '100%',
-  boxSizing: 'border-box' as React.CSSProperties['boxSizing'],
-  outline: 'none',
-  border: 'none',
-  background: 'var(--cb-background)',
-  color: 'var(--cb-foreground)',
-};
-
-const animatorStyle = {
-  maxWidth: '600px',
-  width: '100%',
-  background: 'var(--cb-background)',
-  color: 'var(--cb-foreground)',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  boxShadow: 'var(--cb-shadow)',
-};
-
-const groupNameStyle = {
+const groupNameStyle: React.CSSProperties = {
   padding: '8px 16px',
   fontSize: '10px',
   textTransform: 'uppercase' as const,
@@ -42,7 +21,8 @@ const groupNameStyle = {
 const actions = [
   {
     id: 'catAction',
-    name: 'Why did you wake me?',
+    name: 'Hello',
+    subtitle: 'Why did you wake me?',
     shortcut: ['c'],
     keywords: 'cat',
     section: 'Functions',
@@ -112,44 +92,24 @@ const ComplexResultItem = (
   return (
     <div
       ref={ref}
-      style={{
-        padding: '12px 16px',
-        background: active ? 'var(--cb-a1)' : 'transparent',
-        borderLeft: `2px solid ${
-          active ? 'var(--cb-foreground)' : 'transparent'
-        }`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        cursor: 'pointer',
-      }}
+      className={`cb-item ${active ? 'active' : ''}`}
     >
       <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          alignItems: 'center',
-          fontSize: 14,
-        }}
+        className="cb-item-label"
       >
         {action.icon && action.icon}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="cb-item-label-container">
           <div>
             {ancestors.length > 0 &&
               ancestors.map((ancestor) => (
                 <React.Fragment key={ancestor.id}>
                   <span
-                    style={{
-                      opacity: 0.5,
-                      marginRight: 8,
-                    }}
+                    className="cb-item-ancestor"
                   >
                     {ancestor.name}
                   </span>
                   <span
-                    style={{
-                      marginRight: 8,
-                    }}
+                    className="cb-breadcrumb-arrow"
                   >
                     &rsaquo;
                   </span>
@@ -158,7 +118,7 @@ const ComplexResultItem = (
             <span>{action.name}</span>
           </div>
           {action.subtitle && (
-            <span style={{ fontSize: 12 }}>{action.subtitle}</span>
+            <span className="cb-item-subtitle">{action.subtitle}</span>
           )}
         </div>
       </div>
@@ -170,12 +130,7 @@ const ComplexResultItem = (
           {action.shortcut.map((sc) => (
             <kbd
               key={sc}
-              style={{
-                padding: '4px 6px',
-                background: 'var(--cb-a2)',
-                borderRadius: '4px',
-                fontSize: 14,
-              }}
+              className="cb-item-shortcut"
             >
               {sc}
             </kbd>
@@ -212,9 +167,9 @@ const RenderResults = () => {
 export const CommandBarLogic = () => {
   return (
     <KBarPortal>
-      <KBarPositioner>
-        <KBarAnimator style={animatorStyle}>
-          <KBarSearch style={searchStyle} />
+      <KBarPositioner className="cb-positioner">
+        <KBarAnimator className="cb-animator">
+          <KBarSearch className="cb-search" />
           <RenderResults />
         </KBarAnimator>
       </KBarPositioner>
