@@ -1,7 +1,175 @@
-em {
-  font-style: italic;
+/* Later make this only apply to the chapter div */
+
+a,a:link {
+  color: var(--link-unvisited-color);
+  font-weight: 500;
 }
 
-em em {
+a:hover {
+  transition: box-shadow 200ms ease 0s;
+  box-shadow: 0px 2px 0px var(--link-underline-color);
+}
+
+a:visited {
+  color: var(--link-visited-color);
+}
+
+.landmark {
+  font-size: 0;
+  opacity: 0;
+}
+.hidden {
+  display: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.heading {
+  word-wrap: break-word;
+}
+
+blockquote, pre {
+  /* TODO: Re-evaluate this later */
+  font-family: 'Noto', Verdana, Helvetica, sans-serif;
+  margin: 0.643em;
+}
+
+blockquote p:first-child {
+  margin-top: 0;
+}
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+kbd,
+tt,
+code,
+var,
+pre,
+samp {
+  font-family: "Monaco", "Consolas", Courier, monospace;
+  margin: auto;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+strong,
+b {
+  font-weight: bold;
+}
+
+em,
+cite,
+i {
+  font-style: oblique;
+}
+cite em,
+em cite,
+cite i,
+i cite,
+i em,
+em i,
+em em,
+i i,
+cite cite {
   font-style: normal;
 }
+em cite,
+i cite,
+ins,
+u {
+  text-decoration: underline;
+}
+del,
+strike {
+  text-decoration: line-through;
+}
+dfn,
+abbr,
+acronym {
+  cursor: help;
+}
+big {
+  font-size: 114%;
+}
+small,
+sub,
+sup {
+  font-size: 87.5%;
+}
+small small small small {
+  font-size: 100%;
+}
+sub {
+  vertical-align: sub;
+  line-height: 0;
+}
+sup {
+  vertical-align: super;
+  line-height: 0;
+}
+
+table {
+  background: #ddd;
+  border-collapse: collapse;
+  margin: auto;
+  width: 100%;
+  clear: right;
+}
+caption {
+  height: 0;
+  width: 0;
+  font-size: 0;
+  opacity: 0;
+  padding: 0;
+  margin: 0;
+}
+
+thead,
+tfoot {
+  border-bottom: 2px solid #bbb;
+  padding: 0.643em;
+  vertical-align: top;
+}
+tfoot td {
+  border-top: 1px solid #bbb;
+}
+td th {
+  padding-right: 1em;
+}
+tbody tr {
+  border-bottom: 1px solid #fff;
+}
+td {
+  padding: 0.25em;
+  vertical-align: top;
+}
+th {
+  text-align: start;
+}
+thead td {
+  background: #ddd;
+  border-bottom: 1px solid #fff;
+}
+th,
+tr:hover,
+col.name {
+  background: #fff;
+  border: 1px solid #bbb;
+  padding: 0.15em 0.5em 0.25em;
+  vertical-align: top;
+}
+th a,
+th a:visited,
+th a:link {
+  text-decoration: none;
+}
+tbody tr th {
+  text-align: start;
+}
+
