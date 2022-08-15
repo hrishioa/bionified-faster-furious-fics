@@ -9,6 +9,8 @@ import { CommandBarIcon } from '@/components/CommandBar/CommandBarIcon';
 import '@/styles/globals.css';
 import '@/styles/commandbar.css';
 import '@/styles/chapters.css';
+import '@/styles/funinput.css';
+import '@/styles/ao3text.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [theme, setTheme] = useState('light');
