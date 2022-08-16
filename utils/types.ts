@@ -19,13 +19,15 @@ export type AO3Work = {
   metaDlHTML: string;
 };
 
+export type ChapterMeta = {
+  relativeLink: string;
+  title: string;
+  id: number;
+  count: number;
+};
+
 export type AO3Chapter = {
-  meta: {
-    relativeLink: string;
-    title: string;
-    id: number;
-    count: number;
-  };
+  meta: ChapterMeta;
   prefaceDivHTML: string;
   summaryDivHTML: string;
   startNotesDivHTML: string;

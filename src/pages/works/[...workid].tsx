@@ -1,10 +1,19 @@
 import { MemoizedChapter } from '@/components/Chapter';
 import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChaptersInMenu';
+import { RootState } from '@/components/Redux-Store/ReduxStore';
+import {
+  setChapterMeta,
+  setCurrentChapter,
+  setScroll,
+} from '@/components/Redux-Store/WorksSlice';
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { ALLOWED_COOKIES, getWorkId, loadWork } from 'utils/fics';
+import { getChapterScrollPosition } from 'utils/scroll';
 import { AO3Work } from 'utils/types';
+import debounce from 'lodash/debounce';
 
 const WorkPage = (props: {
   work: AO3Work | null;
@@ -12,11 +21,48 @@ const WorkPage = (props: {
   selectedChapter: number | null;
 }) => {
   const { work, cookies, selectedChapter } = props;
-
-  const [activeChapter, setActiveChapter] = useState(null as number | null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setActiveChapter(selectedChapter);
+    const saveScrollPosition = debounce(() => {
+      const { chapterId, scrollPosition } = getChapterScrollPosition(
+        document,
+        work?.chapters.map((chapter) => chapter.meta) || [],
+      );
+      dispatch(
+        setScroll({ chapterId, scrollPercentage: scrollPosition * 100 }),
+      );
+      return;
+    }, 100);
+
+    if (document) {
+      document.addEventListener('scroll', saveScrollPosition, {
+        passive: true,
+      });
+    }
+
+    return () => {
+      saveScrollPosition.cancel();
+      document.removeEventListener('scroll', saveScrollPosition);
+    };
+  }, [work, dispatch]);
+
+  const currentChapterId = useSelector(
+    (state: RootState) => state.work.currentChapterId,
+  );
+  // const [activeChapter, setActiveChapter] = useState(null as number | null);
+
+  useEffect(() => {
+    dispatch(
+      setChapterMeta(work?.chapters.map((chapter) => chapter.meta) || []),
+    );
+  }, [work, dispatch]);
+
+  useEffect(() => {
+    dispatch(
+      setCurrentChapter(selectedChapter || work?.chapters[0].meta.id || 0),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -35,8 +81,8 @@ const WorkPage = (props: {
   });
 
   useEffect(() => {
-    console.log('active chapter changed in work to ', activeChapter);
-  }, [activeChapter]);
+    console.log('active chapter changed in work to ', currentChapterId);
+  }, [currentChapterId]);
 
   useRegisterChaptersInMenu(
     work?.chapters.map((chapter) => ({
@@ -45,7 +91,6 @@ const WorkPage = (props: {
       id: chapter.meta.id,
     })) || [],
     work?.chapters.length || 0,
-    setActiveChapter,
   );
 
   console.log('Setting up chapter menus');
@@ -54,7 +99,7 @@ const WorkPage = (props: {
     <div>
       {work?.chapters.map((chapter) => (
         <MemoizedChapter
-          selected={activeChapter === chapter.meta.id}
+          selected={currentChapterId === chapter.meta.id}
           chapter={chapter}
           key={chapter.meta.id}
         />

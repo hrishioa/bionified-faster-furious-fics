@@ -10,24 +10,10 @@ import {
   ActionId,
   ActionImpl,
 } from 'kbar';
-
-const groupNameStyle: React.CSSProperties = {
-  padding: '8px 16px',
-  fontSize: '10px',
-  textTransform: 'uppercase' as const,
-  opacity: 0.5,
-};
+import { useSelector } from 'react-redux';
+import { RootState } from '../Redux-Store/ReduxStore';
 
 const actions = [
-  {
-    id: 'catAction',
-    name: 'Hello',
-    subtitle: 'Why did you wake me?',
-    shortcut: ['c'],
-    keywords: 'cat',
-    section: 'Functions',
-    perform: () => window.open('https://www.youtube.com/watch?v=dEFGfu_tHsA'),
-  },
   {
     id: 'theme',
     name: 'Change theme…',
@@ -64,6 +50,15 @@ const actions = [
     perform: () => {
       document.documentElement.setAttribute('data-theme', 'blue');
     },
+  },
+  {
+    id: 'catAction',
+    name: 'Hello',
+    subtitle: 'Why did you wake me?',
+    shortcut: ['c'],
+    keywords: 'cat',
+    section: 'Functions',
+    perform: () => window.open('https://www.youtube.com/watch?v=dEFGfu_tHsA'),
   },
 ];
 
@@ -135,7 +130,7 @@ const RenderResults = () => {
       items={results}
       onRender={({ item, active }) =>
         typeof item === 'string' ? (
-          <div style={groupNameStyle}>{item}</div>
+          <div className="cb-group-name">{item}</div>
         ) : (
           <ComplexResultItemRef
             action={item}
@@ -149,11 +144,37 @@ const RenderResults = () => {
 };
 
 export const CommandBarLogic = () => {
+  // TODO: Question: How can we do this better?
+  const { curChapterName, curScrollPercent } = useSelector(
+    (state: RootState) => ({
+      curChapterName:
+        (state.work.chapterInfo &&
+          state.work.chapterInfo.find(
+            (chapter) => chapter.id === state.work.currentChapterId,
+          )?.title) ||
+        null,
+      curScrollPercent: state.work.chapterScrollPercentage,
+    }),
+  );
+  const MAX_CHAPTER_NAME_LENGTH = 35;
+
   return (
     <KBarPortal>
       <KBarPositioner className="cb-positioner">
         <KBarAnimator className="cb-animator">
-          <KBarSearch className="cb-search" />
+          <KBarSearch
+            defaultPlaceholder={
+              curChapterName
+                ? `${curScrollPercent.toFixed(1)}% through ${
+                    curChapterName.slice(0, MAX_CHAPTER_NAME_LENGTH) +
+                    (curChapterName.length > MAX_CHAPTER_NAME_LENGTH
+                      ? '...'
+                      : '')
+                  }`
+                : undefined
+            }
+            className="cb-search"
+          />
           <RenderResults />
         </KBarAnimator>
       </KBarPositioner>

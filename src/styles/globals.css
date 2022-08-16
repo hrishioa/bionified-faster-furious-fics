@@ -12,7 +12,7 @@
   --rest-color: rgb(97, 97, 97);
   --cb-overlay-color: rgba(150, 150, 150, 0.159);
   --cb-transparent-background: rgba(255, 255, 255, 0.285);
-  --cb-placeholder-color: rgb(67, 67, 67);
+  --cb-placeholder-color: rgb(125, 125, 125);
   --highlight-background: rgb(3, 107, 107);
   --highlight-text-color: white;
   --link-unvisited-color: hsl(231deg 100% 60%);
@@ -71,7 +71,7 @@ body {
   transition: color 500ms ease 0s, background 500ms ease 0s;
 }
 
-.theme-switch-container {
+.navbar {
   display: flex;
   justify-content: flex-end;
   margin: 20px;

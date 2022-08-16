@@ -1,8 +1,10 @@
 import Image from 'next/image';
-import React, { CSSProperties, Ref, useEffect, useRef, useState } from 'react';
+import React, { Ref, useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { bioHTML } from 'utils/bionify';
 import { getToolbarPosition } from 'utils/selection';
 import { AO3Chapter, ToolbarPosition } from 'utils/types';
+import { setCurrentChapter } from './Redux-Store/WorksSlice';
 
 type SelectionToolbarProps = {
   positionStyle: ToolbarPosition;
@@ -20,6 +22,8 @@ type ChapterProps = {
 };
 
 const Chapter = ({ chapter, selected }: ChapterProps) => {
+  const dispatch = useDispatch();
+
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
   const [showingChapterContent, showChapterContent] = useState(false);
   const safeChapterContent = bioHTML(chapter.textDivHTML, {
@@ -46,27 +50,28 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
           });
       }, waitToScrollMs);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
   useEffect(() => {
+    function highlightSelectedTags(tags: string[]) {
+      document
+        .querySelectorAll('.text-selected')
+        ?.forEach((elem) => elem.classList.remove('text-selected'));
+
+      tags.forEach((tag) => {
+        document
+          .querySelector(`.chapter-${chapter.meta.id}`)
+          ?.querySelectorAll(`:scope .${tag}`)
+          ?.forEach((elem) => elem.classList.add('text-selected'));
+      });
+    }
+
     highlightSelectedTags(selectedTags);
-  }, [selectedTags]);
+  }, [selectedTags, chapter.meta.id]);
 
   function getSelectedTags(selectionHTML: string) {
     return selectionHTML.match(/tp-[\d]+-[\d]+/g);
-  }
-
-  function highlightSelectedTags(tags: string[]) {
-    document
-      .querySelectorAll('.text-selected')
-      ?.forEach((elem) => elem.classList.remove('text-selected'));
-
-    tags.forEach((tag) => {
-      document
-        .querySelector(`.chapter-${chapter.meta.id}`)
-        ?.querySelectorAll(`.${tag}`)
-        ?.forEach((elem) => elem.classList.add('text-selected'));
-    });
   }
 
   function highlightSelection(selectionHTML: string) {
@@ -106,11 +111,16 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
   }
 
   return (
-    <>
+    <div
+      className={`chapter_container chapter_container_${chapter.meta.count}`}
+    >
       <div
         ref={titleDivRef}
         className="chapter_title"
-        onClick={() => showChapterContent((curVal) => !curVal)}
+        onClick={() => {
+          dispatch(setCurrentChapter(chapter.meta.id));
+          showChapterContent((curVal) => !curVal);
+        }}
       >
         {chapter.meta.title}
       </div>
@@ -122,29 +132,32 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
           __html: (showingChapterContent && safeChapterContent) || '',
         }}
       />
-      {showingChapterContent && <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          padding: '30px 0'
-        }}
-      >
-        <Image
-          src="/curlydivider.svg"
-          alt="Divider"
-          width="500"
-          height="100"
+      {(showingChapterContent && (
+        <div
           style={{
-            maxHeight: '50px',
-            margin: 'auto 0',
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '30px 0',
           }}
-        />
-      </div> || null}
+        >
+          <Image
+            src="/curlydivider.svg"
+            alt="Divider"
+            width="500"
+            height="100"
+            style={{
+              maxHeight: '50px',
+              margin: 'auto 0',
+            }}
+          />
+        </div>
+      )) ||
+        null}
 
       {selectionToolbarConfig ? (
         <SelectionToolbar {...selectionToolbarConfig} />
       ) : null}
-    </>
+    </div>
   );
 };
 

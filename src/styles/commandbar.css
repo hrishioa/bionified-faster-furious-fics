@@ -20,6 +20,13 @@
   color: var(--cb-placeholder-color);
 }
 
+.cb-group-name {
+  padding: 8px 16px;
+  font-size: 10px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
 .cb-animator {
   max-width: 600px;
   width: 100%;

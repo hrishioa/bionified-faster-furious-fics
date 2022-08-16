@@ -1,5 +1,6 @@
+import { setCurrentChapter } from '@/components/Redux-Store/WorksSlice';
 import { ActionImpl, useRegisterActions } from 'kbar';
-import React from 'react';
+import { useDispatch } from 'react-redux';
 
 type MenuChapter = {
   name: string;
@@ -10,8 +11,9 @@ type MenuChapter = {
 export default function useRegisterChaptersInMenu(
   chapters: MenuChapter[],
   chapterCount: number,
-  setActiveChapter: React.Dispatch<React.SetStateAction<number | null>>,
 ) {
+  const dispatch = useDispatch();
+
   const chapterActions = [
     ...[
       {
@@ -28,8 +30,7 @@ export default function useRegisterChaptersInMenu(
       keywords: 'chapter jump',
       parent: 'jumpToChapter',
       perform: (action: ActionImpl) => {
-        console.log('Setting active chapter to ', action.id);
-        setActiveChapter(parseInt(action.id));
+        dispatch(setCurrentChapter(parseInt(action.id)));
       },
     })),
   ];
