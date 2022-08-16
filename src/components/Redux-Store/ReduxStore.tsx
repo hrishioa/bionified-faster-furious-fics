@@ -11,7 +11,7 @@ export type ReduxStoreProps = {
 const store = configureStore({
   reducer: {
     work: workReducer,
-    user: userReducer
+    user: userReducer,
   },
 });
 

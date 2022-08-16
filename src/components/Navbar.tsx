@@ -21,14 +21,14 @@ export const NavBar: React.FC<any> = () => {
     let pastScroll = window.scrollY;
 
     const scrollHandler = () => {
-      if(window.scrollY > 100) {
+      if (window.scrollY > 100) {
         setBottomBarEnabled(true);
       } else {
         setBottomBarEnabled(false);
       }
 
-      if(Math.abs(pastScroll - window.scrollY) > 50) {
-        if(pastScroll > window.scrollY) {
+      if (Math.abs(pastScroll - window.scrollY) > 50) {
+        if (pastScroll > window.scrollY) {
           setBottomBarShown(true);
         } else {
           setBottomBarShown(false);
@@ -36,22 +36,28 @@ export const NavBar: React.FC<any> = () => {
 
         pastScroll = window.scrollY;
       }
-    }
+    };
 
-    window.addEventListener('scroll', scrollHandler, {passive: true});
+    window.addEventListener('scroll', scrollHandler, { passive: true });
 
     return () => window.removeEventListener('scroll', scrollHandler);
   });
 
   return (
     <>
-      {bottomBarEnabled && <div style={{
-        height: '80px'
-      }}></div>}
-      <div className={`navbar ${bottomBarEnabled ? 'bottom': ''} ${bottomBarShown && bottomBarEnabled ? 'bottom-shown': ''}`}>
-        <div className='username'>
-          {username}
-        </div>
+      {bottomBarEnabled && (
+        <div
+          style={{
+            height: '80px',
+          }}
+        ></div>
+      )}
+      <div
+        className={`navbar ${bottomBarEnabled ? 'bottom' : ''} ${
+          bottomBarShown && bottomBarEnabled ? 'bottom-shown' : ''
+        }`}
+      >
+        <div className="username">{username}</div>
         <DarkModeSwitch
           checked={theme === 'dark'}
           style={{

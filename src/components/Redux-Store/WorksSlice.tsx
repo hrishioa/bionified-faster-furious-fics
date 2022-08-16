@@ -12,7 +12,7 @@ const initialWorkState: WorkState = {
   chapterInfo: [],
   currentChapterId: 0,
   chapterScrollPercentage: 0,
-  jumpToChapter: null
+  jumpToChapter: null,
 };
 
 const workSlice = createSlice({

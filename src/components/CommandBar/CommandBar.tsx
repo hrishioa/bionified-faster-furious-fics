@@ -12,7 +12,6 @@ import {
 } from 'kbar';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Redux-Store/ReduxStore';
-import useDetectFontSize from './SubMenus/useDetectFontSize';
 
 const actions = [
   //TODO: Re-enable when font size is implemented
@@ -165,7 +164,6 @@ export const CommandBarLogic = () => {
     }),
   );
   const MAX_CHAPTER_NAME_LENGTH = 35;
-
 
   // useDetectFontSize();
 

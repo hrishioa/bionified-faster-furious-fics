@@ -1,4 +1,6 @@
-import { jumpToChapter, setCurrentChapter } from '@/components/Redux-Store/WorksSlice';
+import {
+  jumpToChapter,
+} from '@/components/Redux-Store/WorksSlice';
 import { ActionImpl, useRegisterActions } from 'kbar';
 import { useDispatch } from 'react-redux';
 

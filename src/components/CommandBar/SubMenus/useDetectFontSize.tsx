@@ -1,4 +1,4 @@
-import { useKBar, useRegisterActions } from 'kbar';
+import { useKBar } from 'kbar';
 import { useEffect } from 'react';
 
 export default function useDetectFontSize() {
@@ -9,7 +9,7 @@ export default function useDetectFontSize() {
   }));
 
   useEffect(() => {
-    console.log('QSA changed - ', {query, rootActionId, search, actions});
+    console.log('QSA changed - ', { query, rootActionId, search, actions });
   }, [query, search, actions, rootActionId]);
 
   useEffect(() => {
@@ -43,10 +43,10 @@ export default function useDetectFontSize() {
     return () => {
       if (unregister) {
         console.log('Unregistering...');
-        console.log('Returned - ',unregister());
+        console.log('Returned - ', unregister());
       }
     };
-  }, [search]);
+  }, [search, query, rootActionId]);
 
   return;
 }

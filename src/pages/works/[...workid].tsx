@@ -8,13 +8,12 @@ import {
 } from '@/components/Redux-Store/WorksSlice';
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ALLOWED_COOKIES, getWorkId, loadWork } from 'utils/fics';
 import { getChapterScrollPosition } from 'utils/scroll';
 import { AO3Work } from 'utils/types';
 import debounce from 'lodash/debounce';
-import { KBarContext, KBarProvider } from 'kbar';
 import { setUsername } from '@/components/Redux-Store/UserSlice';
 
 const WorkPage = (props: {
@@ -24,7 +23,9 @@ const WorkPage = (props: {
 }) => {
   const { work, cookies, selectedChapter } = props;
   const dispatch = useDispatch();
-  const jumpToChapter = useSelector((state: RootState) => state.work.jumpToChapter);
+  const jumpToChapter = useSelector(
+    (state: RootState) => state.work.jumpToChapter,
+  );
 
   useEffect(() => {
     dispatch(setUsername(work?.meta.username || null));
@@ -97,7 +98,9 @@ const WorkPage = (props: {
     <div>
       {work?.chapters.map((chapter) => (
         <MemoizedChapter
-          jumpToThisChapter={jumpToChapter && jumpToChapter === chapter.meta.id || false}
+          jumpToThisChapter={
+            (jumpToChapter && jumpToChapter === chapter.meta.id) || false
+          }
           chapter={chapter}
           key={chapter.meta.id}
         />
