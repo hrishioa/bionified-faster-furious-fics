@@ -43,3 +43,25 @@
 .bio-rest {
   color: var(--rest-color);
 }
+
+@media(max-width: 900px) {
+  .chapter_text {
+    max-width: 80vw;
+  }
+
+  .chapter_title {
+    max-width: 80vw;
+  }
+}
+
+@media(max-width: 500px) {
+  .chapter_text {
+    max-width: 90vw;
+    font-size: 18px;
+  }
+
+  .chapter_title {
+    max-width: 90vw;
+    font-size: 1.3rem;
+  }
+}

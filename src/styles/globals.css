@@ -117,3 +117,13 @@ a {
     max-width: 80vw;
   }
 }
+
+@media(max-width: 500px) {
+  body {
+    font-size: 0.6rem;
+  }
+
+  .chapter_text {
+    max-width: 90vw;
+  }
+}
