@@ -18,10 +18,10 @@ const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
 
 type ChapterProps = {
   chapter: AO3Chapter;
-  selected: boolean;
+  jumpToThisChapter: boolean;
 };
 
-const Chapter = ({ chapter, selected }: ChapterProps) => {
+const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
   const dispatch = useDispatch();
 
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
@@ -36,7 +36,7 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
   const [selectedTags, setSelectedTags] = useState([] as string[]);
 
   useEffect(() => {
-    if (selected) {
+    if (jumpToThisChapter) {
       let waitToScrollMs = 0;
       if (!showingChapterContent) {
         showChapterContent(true);
@@ -51,7 +51,7 @@ const Chapter = ({ chapter, selected }: ChapterProps) => {
       }, waitToScrollMs);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
+  }, [jumpToThisChapter]);
 
   useEffect(() => {
     function highlightSelectedTags(tags: string[]) {

@@ -1,4 +1,4 @@
-import { setCurrentChapter } from '@/components/Redux-Store/WorksSlice';
+import { jumpToChapter, setCurrentChapter } from '@/components/Redux-Store/WorksSlice';
 import { ActionImpl, useRegisterActions } from 'kbar';
 import { useDispatch } from 'react-redux';
 
@@ -30,7 +30,7 @@ export default function useRegisterChaptersInMenu(
       keywords: 'chapter jump',
       parent: 'jumpToChapter',
       perform: (action: ActionImpl) => {
-        dispatch(setCurrentChapter(parseInt(action.id)));
+        dispatch(jumpToChapter(parseInt(action.id)));
       },
     })),
   ];

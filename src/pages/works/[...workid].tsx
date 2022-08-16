@@ -22,6 +22,10 @@ const WorkPage = (props: {
 }) => {
   const { work, cookies, selectedChapter } = props;
   const dispatch = useDispatch();
+  // const currentChapterId = useSelector(
+  //   (state: RootState) => state.work.currentChapterId,
+  // );
+  const jumpToChapter = useSelector((state: RootState) => state.work.jumpToChapter);
 
   useEffect(() => {
     const saveScrollPosition = debounce(() => {
@@ -46,11 +50,6 @@ const WorkPage = (props: {
       document.removeEventListener('scroll', saveScrollPosition);
     };
   }, [work, dispatch]);
-
-  const currentChapterId = useSelector(
-    (state: RootState) => state.work.currentChapterId,
-  );
-  // const [activeChapter, setActiveChapter] = useState(null as number | null);
 
   useEffect(() => {
     dispatch(
@@ -80,10 +79,6 @@ const WorkPage = (props: {
     }
   });
 
-  useEffect(() => {
-    console.log('active chapter changed in work to ', currentChapterId);
-  }, [currentChapterId]);
-
   useRegisterChaptersInMenu(
     work?.chapters.map((chapter) => ({
       name: chapter.meta.title,
@@ -99,7 +94,7 @@ const WorkPage = (props: {
     <div>
       {work?.chapters.map((chapter) => (
         <MemoizedChapter
-          selected={currentChapterId === chapter.meta.id}
+          jumpToThisChapter={jumpToChapter && jumpToChapter === chapter.meta.id || false}
           chapter={chapter}
           key={chapter.meta.id}
         />

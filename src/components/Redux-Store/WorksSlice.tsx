@@ -5,12 +5,14 @@ export type WorkState = {
   chapterInfo: ChapterMeta[];
   currentChapterId: number;
   chapterScrollPercentage: number;
+  jumpToChapter: null | number;
 };
 
 const initialWorkState: WorkState = {
   chapterInfo: [],
   currentChapterId: 0,
   chapterScrollPercentage: 0,
+  jumpToChapter: null
 };
 
 const workSlice = createSlice({
@@ -22,6 +24,9 @@ const workSlice = createSlice({
     },
     setCurrentChapter: (state, action: PayloadAction<number>) => {
       state.currentChapterId = action.payload;
+    },
+    jumpToChapter: (state, action: PayloadAction<number | null>) => {
+      state.jumpToChapter = action.payload;
     },
     setScroll: (
       state,
@@ -41,6 +46,6 @@ export const getCurrentChapterName = (state: WorkState) => {
   else return null;
 };
 
-export const { setCurrentChapter, setChapterMeta, setScroll } =
+export const { setCurrentChapter, setChapterMeta, setScroll, jumpToChapter } =
   workSlice.actions;
 export default workSlice.reducer;
