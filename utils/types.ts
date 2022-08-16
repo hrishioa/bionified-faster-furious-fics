@@ -4,7 +4,9 @@ import { CSSProperties } from 'react';
 export type WorkInfo = {
   id: number;
   title: string;
+  username: string | null;
   authenticityToken: string;
+  subscribeId: number | null;
   workMeta: WorkMeta;
   workStats: WorkStats;
 };

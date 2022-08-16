@@ -8,12 +8,14 @@ import {
 } from '@/components/Redux-Store/WorksSlice';
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ALLOWED_COOKIES, getWorkId, loadWork } from 'utils/fics';
 import { getChapterScrollPosition } from 'utils/scroll';
 import { AO3Work } from 'utils/types';
 import debounce from 'lodash/debounce';
+import { KBarContext, KBarProvider } from 'kbar';
+import { setUsername } from '@/components/Redux-Store/UserSlice';
 
 const WorkPage = (props: {
   work: AO3Work | null;
@@ -22,10 +24,11 @@ const WorkPage = (props: {
 }) => {
   const { work, cookies, selectedChapter } = props;
   const dispatch = useDispatch();
-  // const currentChapterId = useSelector(
-  //   (state: RootState) => state.work.currentChapterId,
-  // );
   const jumpToChapter = useSelector((state: RootState) => state.work.jumpToChapter);
+
+  useEffect(() => {
+    dispatch(setUsername(work?.meta.username || null));
+  }, [work, dispatch]);
 
   useEffect(() => {
     const saveScrollPosition = debounce(() => {

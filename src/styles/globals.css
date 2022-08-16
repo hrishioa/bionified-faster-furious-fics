@@ -78,6 +78,13 @@ body {
   height: 80px;
 }
 
+.navbar .username {
+  padding: 20px;
+  font-size: 20px;
+  color: var(--link-unvisited-color);
+  font-family: Noto Sans, sans-serif;
+}
+
 .navbar.bottom {
   position: fixed;
   background-color: var(--body-bg-color);
@@ -106,24 +113,4 @@ a {
 .selection-container {
   position: absolute;
   background-color: hsl(11deg 100% 42% / 75%);
-}
-
-@media(max-width: 900px) {
-  body {
-    font-size: 0.7rem;
-  }
-
-  .chapter_text {
-    max-width: 80vw;
-  }
-}
-
-@media(max-width: 500px) {
-  body {
-    font-size: 0.6rem;
-  }
-
-  .chapter_text {
-    max-width: 90vw;
-  }
 }

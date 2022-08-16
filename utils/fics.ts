@@ -7,7 +7,7 @@ import { AO3Chapter, AO3Work, WorkMeta, WorkStats, workTags } from './types';
 
 dotenv.config({ path: __dirname + '../.env' });
 
-export const ALLOWED_COOKIES = ['_otwarchive_session', 'user_credentials'];
+export const ALLOWED_COOKIES = ['_otwarchive_session', 'user_credentials', 'remember_user_token'];
 
 function getTimeTag() {
   return (Math.random() + 1).toString(36).substring(7);
@@ -47,7 +47,10 @@ async function authenticate(): Promise<{
       authenticity_token: authenticityToken as string,
       'user[login]': process.env.AO3_USERNAME as string,
       'user[password]': process.env.AO3_PASSWORD as string,
+      'user[remember_me]': '1'
     });
+
+    // console.log('Params - ', params);
 
     console.time(`${runTag} - Logging in                `);
     const { status: authStatus, request: authRequest } = await client.post(
@@ -105,25 +108,32 @@ export async function loadWork(
   cookies: string[],
   verifyLogin = false,
   singleRetry?: boolean,
-): Promise<{ work: AO3Work; cookies: string[] } | null> {
+): Promise<{
+  work: AO3Work;
+  cookies: string[];
+  workDOM: cheerio.CheerioAPI;
+} | null> {
   let client: AxiosInstance | null = null;
   let cookieJar = new ToughCookie.CookieJar();
 
   if (cookies.length) {
+    console.log('Got cookies from client ',cookies);
+
     cookies.map((cookie) =>
-      cookieJar.setCookieSync(cookie, 'https://archiveofourown.org/'),
+      cookieJar.setCookieSync(cookie, 'https://archiveofourown.org'),
     );
 
     client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
 
-    if(verifyLogin) {
+    // TODO: Re-enable after fixing auth
+    if (verifyLogin) {
+    // if(true) {
       console.log('Verifying login...');
-      if(!await verifyAuth(client))
-        cookies = [];
+      if (!(await verifyAuth(client))) cookies = [];
     }
   }
 
-  if(!cookies.length) {
+  if (!cookies.length) {
     console.log('Re-authenticating because cookies are missing...');
     const authData = await authenticate();
     client = authData?.client || null;
@@ -135,7 +145,11 @@ export async function loadWork(
   const runTag = getTimeTag();
 
   console.time(`${runTag} - Loading fic ${workId}`);
-  const { data: workData, status: workStatus, request: workRequest } = await client
+  const {
+    data: workData,
+    status: workStatus,
+    request: workRequest,
+  } = await client
     .get(
       `https://archiveofourown.org/works/${workId}?view_adult=true&view_full_work=true`,
     )
@@ -146,10 +160,9 @@ export async function loadWork(
     });
   console.timeEnd(`${runTag} - Loading fic ${workId}`);
 
-  if(workRequest._redirectable._redirectCount > 0 || workStatus !== 200) {
+  if (workRequest._redirectable._redirectCount > 0 || workStatus !== 200) {
     console.log('Work seems redirected, retrying...');
-    if(!singleRetry)
-      return loadWork(workId, cookies, true, true);
+    if (!singleRetry) return loadWork(workId, [], false, true);
     else {
       console.log('Skipping because we already retried');
       return null;
@@ -158,21 +171,53 @@ export async function loadWork(
 
   const workDOM = cheerio.load(workData);
 
+  if(!workDOM('div#greeting').length && !singleRetry) {
+    console.log("Work doesn't have a greeting, running auth again.");
+    return loadWork(workId, [], false, true);
+  }
+
+  const username = getUsernameFromWork(workDOM);
+
   const heading = workDOM('h2.heading').text();
 
   const processedWork = processWork(workDOM, workId);
+
+  processedWork.meta.username = username;
 
   if (heading.toLowerCase().includes('error 404')) {
     console.error('Could not find fic');
     return null;
   }
 
+  console.log('Got cookies from server ',await cookieJar.getSetCookieStrings(
+    'https://archiveofourown.org',
+  ));
+
   return {
     work: processedWork,
+    workDOM,
     cookies: await cookieJar.getSetCookieStrings(
-      'https://archiveofourown.org/',
+      'https://archiveofourown.org',
     ),
   };
+}
+
+function getUsernameFromWork(workDOM: cheerio.CheerioAPI): string | null {
+  let username: null | string = null;
+
+  const greetingDiv = workDOM('div#greeting');
+  if(!greetingDiv.length)
+    return username;
+
+  const greetingLinks = greetingDiv.find('a').toArray().forEach(link => {
+    if(link && link.attribs && link.attribs.href) {
+      const match = link.attribs.href.match(/\/users\/([\w\W]+)\/preferences/);
+      if(match && match.length > 1)
+        username = match[1];
+    }
+  });
+
+  return username;
 }
 
 function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
@@ -187,7 +232,7 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
     chapters.push(loadChapter(chapterDiv));
   }
 
-  if(chapters.length === 0) {
+  if (chapters.length === 0) {
     chapters.push(loadChapter(workDOM('div#workskin')));
   }
 
@@ -201,12 +246,24 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
 
   const { meta: workMeta, stats: workStats } = extractMeta(workDOM);
 
+  let subscribeId: number | null = null;
+
+  const subscribeLink = workDOM('ul.work.navigation.actions').find('li.subscribe').find('form').attr('action');
+  if(subscribeLink) {
+    const subscribeTags = subscribeLink.split('/');
+    console
+    if(!isNaN(parseInt(subscribeTags[subscribeTags.length-1])))
+      subscribeId = parseInt(subscribeTags[subscribeTags.length-1]);
+  }
+
   console.timeEnd('Processed fic');
 
   return {
     meta: {
       title,
+      username: null,
       id: workId,
+      subscribeId,
       authenticityToken,
       workMeta,
       workStats,
@@ -282,21 +339,18 @@ function cleanString(text: string): string {
 
 function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
   let prefaceDiv = chapterDiv.find('div.preface.module.group');
-  if(!prefaceDiv.length)
-    prefaceDiv = chapterDiv.find('div.preface.group');
+  if (!prefaceDiv.length) prefaceDiv = chapterDiv.find('div.preface.group');
   let summaryDiv = chapterDiv.find('div#summary');
-  if(!summaryDiv.length)
-    summaryDiv = chapterDiv.find('div.summary.module');
+  if (!summaryDiv.length) summaryDiv = chapterDiv.find('div.summary.module');
   let startNotesDiv = chapterDiv.find('div#notes');
-  if(!startNotesDiv.length)
-    startNotesDiv = chapterDiv.find('div.notes');
+  if (!startNotesDiv.length) startNotesDiv = chapterDiv.find('div.notes');
 
   const count = parseInt((chapterDiv.attr('id') as string).split('-')[1]);
 
-  const endNotesDiv = !isNaN(count) && chapterDiv.find(`div#chapter_${count}_endnotes`) || null;
+  const endNotesDiv =
+    (!isNaN(count) && chapterDiv.find(`div#chapter_${count}_endnotes`)) || null;
   let titleH3 = chapterDiv.find('h3.title');
-  if(!titleH3.length)
-    titleH3 = chapterDiv.find('h2.title');
+  if (!titleH3.length) titleH3 = chapterDiv.find('h2.title');
   const textDiv = chapterDiv.find('div[role=article]');
 
   const chapterRelLink =
@@ -315,7 +369,8 @@ function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
     prefaceDivHTML: prefaceDiv.html() || '',
     summaryDivHTML: summaryDiv.html() || '',
     startNotesDivHTML: startNotesDiv?.html() || '',
-    endNotesDivHTML: endNotesDiv && endNotesDiv.length && endNotesDiv.html() || '',
+    endNotesDivHTML:
+      (endNotesDiv && endNotesDiv.length && endNotesDiv.html()) || '',
     titleH3HTML: titleH3.html() || '',
     textDivHTML: textDiv.html() || '',
   };

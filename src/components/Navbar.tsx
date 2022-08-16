@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
 import { CommandBarIcon } from './CommandBar/CommandBarIcon';
+import { RootState } from './Redux-Store/ReduxStore';
 
 export const NavBar: React.FC<any> = () => {
   const [theme, setTheme] = useState('light');
   const [bottomBarEnabled, setBottomBarEnabled] = useState(false);
   const [bottomBarShown, setBottomBarShown] = useState(false);
+
+  const username = useSelector((state: RootState) => state.user.username);
 
   useEffect(() => {
     if (document) {
@@ -41,10 +45,13 @@ export const NavBar: React.FC<any> = () => {
 
   return (
     <>
-        {bottomBarEnabled && <div style={{
-          height: '80px'
-        }}></div>}
-        <div className={`navbar ${bottomBarEnabled ? 'bottom': ''} ${bottomBarShown && bottomBarEnabled ? 'bottom-shown': ''}`}>
+      {bottomBarEnabled && <div style={{
+        height: '80px'
+      }}></div>}
+      <div className={`navbar ${bottomBarEnabled ? 'bottom': ''} ${bottomBarShown && bottomBarEnabled ? 'bottom-shown': ''}`}>
+        <div className='username'>
+          {username}
+        </div>
         <DarkModeSwitch
           checked={theme === 'dark'}
           style={{
@@ -57,7 +64,7 @@ export const NavBar: React.FC<any> = () => {
           moonColor="var(--heading-color)"
           sunColor="var(--heading-color)"
         />
-      <CommandBarIcon />
+        <CommandBarIcon />
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Lottie from 'lottie-react';
 // import * as CatInABox from '@/animations/29718-cat-in-a-box.json';
 import * as CatRotate from '@/animations/52831-rotation-cats.json';

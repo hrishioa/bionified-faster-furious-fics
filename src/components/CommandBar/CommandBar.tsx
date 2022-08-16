@@ -12,8 +12,16 @@ import {
 } from 'kbar';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Redux-Store/ReduxStore';
+import useDetectFontSize from './SubMenus/useDetectFontSize';
 
 const actions = [
+  //TODO: Re-enable when font size is implemented
+  // {
+  //   id: 'fontsize',
+  //   name: 'Font Size',
+  //   keywords: 'interface font size',
+  //   section: 'Preferences',
+  // },
   {
     id: 'theme',
     name: 'Change theme…',
@@ -157,6 +165,9 @@ export const CommandBarLogic = () => {
     }),
   );
   const MAX_CHAPTER_NAME_LENGTH = 35;
+
+
+  // useDetectFontSize();
 
   return (
     <KBarPortal>

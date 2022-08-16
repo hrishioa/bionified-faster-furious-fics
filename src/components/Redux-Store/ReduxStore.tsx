@@ -1,6 +1,7 @@
 import React from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 import workReducer from './WorksSlice';
+import userReducer from './UserSlice';
 import { Provider } from 'react-redux';
 
 export type ReduxStoreProps = {
@@ -10,6 +11,7 @@ export type ReduxStoreProps = {
 const store = configureStore({
   reducer: {
     work: workReducer,
+    user: userReducer
   },
 });
 

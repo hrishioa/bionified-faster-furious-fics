@@ -38,14 +38,6 @@ const workSlice = createSlice({
   },
 });
 
-export const getCurrentChapterName = (state: WorkState) => {
-  const matchingChapter = state.chapterInfo.find(
-    (chapter) => chapter.id === state.currentChapterId,
-  );
-  if (matchingChapter) return matchingChapter.title;
-  else return null;
-};
-
 export const { setCurrentChapter, setChapterMeta, setScroll, jumpToChapter } =
   workSlice.actions;
 export default workSlice.reducer;

@@ -1,4 +1,3 @@
-import { AppDispatch } from '@/components/Redux-Store/ReduxStore';
 import { ChapterMeta } from './types';
 
 export const getScrollPosition = (element: Element) => {
