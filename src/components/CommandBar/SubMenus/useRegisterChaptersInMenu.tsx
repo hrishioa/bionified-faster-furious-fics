@@ -1,3 +1,4 @@
+import { ChapterIcon, PagesFlipping } from '@/components/Icons';
 import {
   jumpToChapter,
 } from '@/components/Redux-Store/WorksSlice';
@@ -20,6 +21,7 @@ export default function useRegisterChaptersInMenu(
     ...[
       {
         id: 'jumpToChapter',
+        icon: <div><PagesFlipping /></div>,
         name: 'Jump To Chapter',
         keywords: 'chapter jump find',
         section: 'Navigation',

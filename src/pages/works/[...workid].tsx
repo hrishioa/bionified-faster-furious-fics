@@ -15,6 +15,9 @@ import { getChapterScrollPosition } from 'utils/scroll';
 import { AO3Work } from 'utils/types';
 import debounce from 'lodash/debounce';
 import { setUsername } from '@/components/Redux-Store/UserSlice';
+import Head from 'next/head';
+import { NavBar } from '@/components/Navbar';
+import { CommandBar } from '@/components/CommandBar/CommandBar';
 
 const WorkPage = (props: {
   work: AO3Work | null;
@@ -93,17 +96,23 @@ const WorkPage = (props: {
   );
 
   return (
-    <div>
-      {work?.chapters.map((chapter) => (
-        <MemoizedChapter
-          jumpToThisChapter={
-            (jumpToChapter && jumpToChapter === chapter.meta.id) || false
-          }
-          chapter={chapter}
-          key={chapter.meta.id}
-        />
-      ))}
-    </div>
+    <>
+      <NavBar />
+      <Head>
+        <title>{(work?.meta.title+' - BF3') || 'FuriousFics'}</title>
+      </Head>
+      <div>
+        {work?.chapters.map((chapter) => (
+          <MemoizedChapter
+            jumpToThisChapter={
+              (jumpToChapter && jumpToChapter === chapter.meta.id) || false
+            }
+            chapter={chapter}
+            key={chapter.meta.id}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 

@@ -12,6 +12,7 @@ import {
 } from 'kbar';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Redux-Store/ReduxStore';
+import { BadCat, DarkModeIcon } from '../Icons';
 
 const actions = [
   //TODO: Re-enable when font size is implemented
@@ -24,6 +25,7 @@ const actions = [
   {
     id: 'theme',
     name: 'Change theme…',
+    icon: <div><DarkModeIcon /></div>,
     keywords: 'interface color dark light',
     section: 'Preferences',
   },
@@ -61,6 +63,7 @@ const actions = [
   {
     id: 'catAction',
     name: 'Hello',
+    icon: <div><BadCat /></div>,
     subtitle: 'Why did you wake me?',
     shortcut: ['c'],
     keywords: 'cat',

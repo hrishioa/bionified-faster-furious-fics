@@ -32,7 +32,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <ReduxStore>
         <CommandBar>
-          <NavBar />
           <Component {...pageProps} />
         </CommandBar>
       </ReduxStore>

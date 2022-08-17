@@ -57,7 +57,7 @@ export const NavBar: React.FC<any> = () => {
           bottomBarShown && bottomBarEnabled ? 'bottom-shown' : ''
         }`}
       >
-        <div className="username">{username}</div>
+        <div className="username">{username || 'Anonymous'}</div>
         <DarkModeSwitch
           checked={theme === 'dark'}
           style={{
