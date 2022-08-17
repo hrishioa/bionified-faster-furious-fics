@@ -18,6 +18,7 @@ import { setUsername } from '@/components/Redux-Store/UserSlice';
 import Head from 'next/head';
 import { NavBar } from '@/components/Navbar';
 import { CommandBar } from '@/components/CommandBar/CommandBar';
+import cookies from 'next-cookies';
 
 const WorkPage = (props: {
   work: AO3Work | null;
@@ -148,6 +149,15 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
           work: null,
         },
       };
+
+    if(allowedCookies.length < 2) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: `/login?when_successful=${ctx.resolvedUrl}`
+        }
+      }
+    }
     const workData = await loadWork(workId, allowedCookies);
 
     return {

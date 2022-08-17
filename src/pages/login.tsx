@@ -25,6 +25,10 @@ export default function Login() {
         console.log('Got data ', data);
         if(data.success && data.cookies && data.cookies.length) {
           (data.cookies as string[]).map(cookie => document.cookie = cookie.replace(/HttpOnly/i, ''));
+
+          const queryParams = Object.fromEntries(new URLSearchParams(window.location.search).entries());
+          if(queryParams.when_successful)
+            window.location.pathname = queryParams.when_successful;
         }
         if (!data.success) {
           setFailed(true);

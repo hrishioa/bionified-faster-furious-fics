@@ -61,8 +61,6 @@ export async function authenticate(credentials?: {
       'commit': 'Log In'
     });
 
-    console.log('Params - ', params);
-
     console.time(`${runTag} - Logging in                `);
     const { status: authStatus, request: authRequest } = await client.post(
       'https://archiveofourown.org/users/login',
@@ -73,8 +71,6 @@ export async function authenticate(credentials?: {
         },
       },
     );
-
-    console.log('authStatus - ',authStatus,', redirectcount - ',)
 
     if (
       !(
