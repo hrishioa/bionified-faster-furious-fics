@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300;400&family=Raleway:wght@200;300;400;500;600&display=swap');
+
+.login-container {
+	margin:auto;
+	font-family: 'Josefin Sans', 'Noto Sans', sans-serif;
+	font-size: 2.3rem;
+	background-color: #26C281;
+	color: white;
+	width:100vw;
+	height:100vh;
+	overflow: hidden;
+	display:flex;
+	justify-content: center;
+	flex-flow: column;
+
+	.title {
+		width:100%;
+		text-align:center;
+		margin-bottom: 2em;
+		color: rgba(0,0,0,0.5);
+	}
+
+	.form {
+		margin:0 auto;
+		width:65vw;
+	}
+
+	.animation {
+		background: none;
+		color: inherit;
+		border: none;
+		padding: 0;
+		font: inherit;
+		cursor: pointer;
+		outline: inherit;
+		position:absolute;
+		bottom: 0;
+		right: -20px;
+	}
+
+	.inputField {
+		position: relative;
+		&:after {
+			content: "";
+			position: absolute;
+			left: 0px;
+			right: 0px;
+			bottom: 0px;
+			z-index: 999;
+			height: 1px;
+			border-bottom-left-radius: 2px;
+			border-bottom-right-radius: 2px;
+			background-position: 0% 0%;
+			// background: linear-gradient(to right, #B294FF, #57E6E6, #FEFFB8, #57E6E6, #B294FF, #57E6E6);
+			background: rgba(0,0,0,0.3);
+			background-size: 500% auto;
+			animation: gradient 3s linear infinite;
+		}
+	}
+
+	input {
+		font-family: 'Josefin Sans';
+		display: block;
+		margin: 0.7em auto;
+		outline: none;
+    padding: 0.5em 0.5em 0.3em 0.5em;
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: rgba(0,0,0,0.65);
+    font-size: 1.2em;
+		font-weight: 400;
+    line-height: 1;
+    -webkit-transition: background-color 0.3s;
+    transition: background-color 0.3s;
+		&:disabled{
+			opacity: 0.5;
+		}
+		// background-color: rgba(0,0,0,0.1);
+		&::placeholder {
+			color: rgba(0,0,0,0.4);
+			font-size: 0.8em;
+			font-weight: 300;
+		}
+		&:focus {
+			background-color: rgba(0,0,0,0.1);
+		}
+	}
+
+	.bounce-cat {
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+	}
+
+	.bounce-5 {
+		animation-name: bounce-5;
+		animation-timing-function: ease;
+	}
+	@keyframes bounce-5 {
+		0%   { transform: translateY(0); }
+		50%  { transform: translateY(-50px); }
+		100% { transform: translateY(0); }
+	}
+}
+
+@media(max-width: 900px) {
+	.login-container {
+		font-size: 1.5rem;
+
+		.form {
+			width:80vw;
+		}
+	}
+
+}

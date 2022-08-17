@@ -1,8 +1,9 @@
 import '@/styles/globals.css';
 import '@/styles/commandbar.css';
 import '@/styles/chapters.css';
-import '@/styles/funinput.css';
 import '@/styles/ao3text.css';
+import '@/styles/funinput.scss';
+
 
 import type { AppProps } from 'next/app';
 import Script from 'next/script';

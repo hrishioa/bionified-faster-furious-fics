@@ -19,7 +19,10 @@ export function getWorkId(queryToken: string) {
   else return null;
 }
 
-async function authenticate(): Promise<{
+export async function authenticate(credentials?: {
+  username: string;
+  password: string;
+}): Promise<{
   client: AxiosInstance;
   cookieJar: ToughCookie.CookieJar;
 } | null> {
@@ -45,8 +48,8 @@ async function authenticate(): Promise<{
 
     const params = new URLSearchParams({
       authenticity_token: authenticityToken as string,
-      'user[login]': process.env.AO3_USERNAME as string,
-      'user[password]': process.env.AO3_PASSWORD as string,
+      'user[login]': credentials?.username || (process.env.AO3_USERNAME as string),
+      'user[password]': credentials?.password || (process.env.AO3_PASSWORD as string),
       'user[remember_me]': '1'
     });
 
