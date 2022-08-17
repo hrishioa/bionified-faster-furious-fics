@@ -117,8 +117,6 @@ export async function loadWork(
   let cookieJar = new ToughCookie.CookieJar();
 
   if (cookies.length) {
-    console.log('Got cookies from client ',cookies);
-
     cookies.map((cookie) =>
       cookieJar.setCookieSync(cookie, 'https://archiveofourown.org'),
     );
@@ -188,10 +186,6 @@ export async function loadWork(
     console.error('Could not find fic');
     return null;
   }
-
-  console.log('Got cookies from server ',await cookieJar.getSetCookieStrings(
-    'https://archiveofourown.org',
-  ));
 
   return {
     work: processedWork,

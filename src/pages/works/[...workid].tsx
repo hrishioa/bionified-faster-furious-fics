@@ -92,8 +92,6 @@ const WorkPage = (props: {
     work?.chapters.length || 0,
   );
 
-  console.log('Setting up chapter menus');
-
   return (
     <div>
       {work?.chapters.map((chapter) => (
