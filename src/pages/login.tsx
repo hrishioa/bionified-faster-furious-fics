@@ -1,12 +1,37 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as CatAnimation from '@/animations/78625-le-petit-chat-cat-noir.json';
 import Lottie, { LottieRef } from 'lottie-react';
 import { Formik } from 'formik';
+import { ALLOWED_COOKIES } from 'utils/types';
 
 export default function Login() {
   const animationRef: LottieRef = useRef(null);
   const [showCat, setShowCat] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    function getQueryParams() {
+      return Object.fromEntries(
+        new URLSearchParams(window.location.search).entries(),
+      );
+    }
+
+    function deleteCookie(name: string) {
+      document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+
+    const query = getQueryParams();
+    if(query.logout && query.logout === 'true') {
+      console.log('Effecting logout...');
+      ALLOWED_COOKIES.map(cookie => deleteCookie(cookie));
+      setErrorMessage('Logged out.');
+    }
+
+    if(query.ficnotfound && query.ficnotfound === 'true') {
+      setErrorMessage('Fic not found. You may not have access.');
+    }
+  }, []);
 
   return (
     <Formik
@@ -23,11 +48,15 @@ export default function Login() {
         });
         const data = await response.json();
         console.log('Got data ', data);
-        if(data.success && data.cookies && data.cookies.length) {
-          (data.cookies as string[]).map(cookie => document.cookie = cookie.replace(/HttpOnly/i, ''));
+        if (data.success && data.cookies && data.cookies.length) {
+          (data.cookies as string[]).map(
+            (cookie) => (document.cookie = cookie.replace(/HttpOnly/i, '')),
+          );
 
-          const queryParams = Object.fromEntries(new URLSearchParams(window.location.search).entries());
-          if(queryParams.when_successful)
+          const queryParams = Object.fromEntries(
+            new URLSearchParams(window.location.search).entries(),
+          );
+          if (queryParams.when_successful)
             window.location.pathname = queryParams.when_successful;
         }
         if (!data.success) {
@@ -56,10 +85,12 @@ export default function Login() {
       }) => (
         <div className="login-container">
           <div className="title">Login to BF3</div>
+          {errorMessage && <div className='subtitle'>{errorMessage}</div>}
           <form id="loginForm" className="form" onSubmit={handleSubmit}>
             <div className={`inputField ${failed ? 'error' : ''}`}>
               <input
-                autoCorrect="off" autoCapitalize="none"
+                autoCorrect="off"
+                autoCapitalize="none"
                 type="text"
                 name="username"
                 disabled={isSubmitting}
@@ -71,7 +102,8 @@ export default function Login() {
             </div>
             <div className={`inputField ${failed ? 'error' : ''}`}>
               <input
-                autoCorrect="off" autoCapitalize="none"
+                autoCorrect="off"
+                autoCapitalize="none"
                 type="password"
                 disabled={isSubmitting}
                 name="password"

@@ -3,11 +3,9 @@ import * as cheerio from 'cheerio';
 import * as dotenv from 'dotenv';
 import * as ToughCookie from 'tough-cookie';
 import * as ACSupport from 'axios-cookiejar-support';
-import { AO3Chapter, AO3Work, WorkMeta, WorkStats, workTags } from './types';
+import { AO3Chapter, AO3Work, FicLoadError, WorkMeta, WorkStats, workTags } from './types';
 
 dotenv.config({ path: __dirname + '../.env' });
-
-export const ALLOWED_COOKIES = ['_otwarchive_session', 'user_credentials', 'remember_user_token'];
 
 function getTimeTag() {
   return (Math.random() + 1).toString(36).substring(7);
@@ -19,7 +17,7 @@ export function getWorkId(queryToken: string) {
   else return null;
 }
 
-export async function authenticate(credentials?: {
+export async function authenticate(credentials: {
   username: string;
   password: string;
 }): Promise<{
@@ -47,18 +45,18 @@ export async function authenticate(credentials?: {
     }
 
     // TODO: Remove later
-    if(!credentials)
+    if (!credentials)
       credentials = {
-        username: (process.env.AO3_USERNAME as string),
-        password: (process.env.AO3_PASSWORD as string)
-      }
+        username: process.env.AO3_USERNAME as string,
+        password: process.env.AO3_PASSWORD as string,
+      };
 
     const params = new URLSearchParams({
       authenticity_token: authenticityToken as string,
       'user[login]': credentials.username,
       'user[password]': credentials.password,
       'user[remember_me]': '1',
-      'commit': 'Log In'
+      commit: 'Log In',
     });
 
     console.time(`${runTag} - Logging in                `);
@@ -97,33 +95,20 @@ export async function authenticate(credentials?: {
   }
 }
 
-async function verifyAuth(client: AxiosInstance) {
-  console.log(`Veriyfing Login Status for ${process.env.AO3_USERNAME}     `);
-  const { request: checkRequest } = await client.get(
-    `https://archiveofourown.org/users/${process.env.AO3_USERNAME}/preferences`,
-  );
-
-  if (checkRequest._redirectable._redirectCount > 0) {
-    console.error('Failed to log in.');
-    return false;
-  }
-
-  console.log('Login verified');
-  return true;
-}
-
 export async function loadWork(
   workId: number,
   cookies: string[],
-  verifyLogin = false,
   singleRetry?: boolean,
-): Promise<{
-  work: AO3Work;
-  cookies: string[];
-  workDOM: cheerio.CheerioAPI;
-} | null> {
+): Promise<
+  | {
+      work: AO3Work;
+      cookies: string[];
+      workDOM: cheerio.CheerioAPI;
+    }
+  | FicLoadError
+> {
   let client: AxiosInstance | null = null;
-  let cookieJar = new ToughCookie.CookieJar();
+  const cookieJar = new ToughCookie.CookieJar();
 
   if (cookies.length) {
     cookies.map((cookie) =>
@@ -131,23 +116,10 @@ export async function loadWork(
     );
 
     client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
-
-    // TODO: Re-enable after fixing auth
-    if (verifyLogin) {
-    // if(true) {
-      console.log('Verifying login...');
-      if (!(await verifyAuth(client))) cookies = [];
-    }
+  } else {
+    console.log('No cookies found');
+    return {failed: true, reason: 'AuthFailed'};
   }
-
-  if (!cookies.length) {
-    console.log('Re-authenticating because cookies are missing...');
-    const authData = await authenticate();
-    client = authData?.client || null;
-    if (authData?.cookieJar) cookieJar = authData?.cookieJar;
-  }
-
-  if (!client) return null;
 
   const runTag = getTimeTag();
 
@@ -165,22 +137,32 @@ export async function loadWork(
       if (error.response) return error.response;
       else return null;
     });
+
+  if(!workData)
+    return {
+      failed: true,
+      reason: 'InvalidFic'
+    }
+
   console.timeEnd(`${runTag} - Loading fic ${workId}`);
 
   if (workRequest._redirectable._redirectCount > 0 || workStatus !== 200) {
     console.log('Work seems redirected, retrying...');
-    if (!singleRetry) return loadWork(workId, [], false, true);
+    if (!singleRetry) return loadWork(workId, [], true);
     else {
       console.log('Skipping because we already retried');
-      return null;
+      return {
+        failed: true,
+        reason: 'AuthFailed'
+      };
     }
   }
 
   const workDOM = cheerio.load(workData);
 
-  if(!workDOM('div#greeting').length && !singleRetry) {
+  if (!workDOM('div#greeting').length && !singleRetry) {
     console.log("Work doesn't have a greeting, running auth again.");
-    return loadWork(workId, [], false, true);
+    return loadWork(workId, [], true);
   }
 
   const username = getUsernameFromWork(workDOM);
@@ -193,15 +175,16 @@ export async function loadWork(
 
   if (heading.toLowerCase().includes('error 404')) {
     console.error('Could not find fic');
-    return null;
+    return {
+      failed: true,
+      reason: 'FicNotFound'
+    };
   }
 
   return {
     work: processedWork,
     workDOM,
-    cookies: await cookieJar.getSetCookieStrings(
-      'https://archiveofourown.org',
-    ),
+    cookies: await cookieJar.getSetCookieStrings('https://archiveofourown.org'),
   };
 }
 
@@ -209,16 +192,19 @@ function getUsernameFromWork(workDOM: cheerio.CheerioAPI): string | null {
   let username: null | string = null;
 
   const greetingDiv = workDOM('div#greeting');
-  if(!greetingDiv.length)
-    return username;
+  if (!greetingDiv.length) return username;
 
-  const greetingLinks = greetingDiv.find('a').toArray().forEach(link => {
-    if(link && link.attribs && link.attribs.href) {
-      const match = link.attribs.href.match(/\/users\/([\w\W]+)\/preferences/);
-      if(match && match.length > 1)
-        username = match[1];
-    }
-  });
+  const greetingLinks = greetingDiv
+    .find('a')
+    .toArray()
+    .forEach((link) => {
+      if (link && link.attribs && link.attribs.href) {
+        const match = link.attribs.href.match(
+          /\/users\/([\w\W]+)\/preferences/,
+        );
+        if (match && match.length > 1) username = match[1];
+      }
+    });
 
   return username;
 }
@@ -251,12 +237,15 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
 
   let subscribeId: number | null = null;
 
-  const subscribeLink = workDOM('ul.work.navigation.actions').find('li.subscribe').find('form').attr('action');
-  if(subscribeLink) {
+  const subscribeLink = workDOM('ul.work.navigation.actions')
+    .find('li.subscribe')
+    .find('form')
+    .attr('action');
+  if (subscribeLink) {
     const subscribeTags = subscribeLink.split('/');
-    console
-    if(!isNaN(parseInt(subscribeTags[subscribeTags.length-1])))
-      subscribeId = parseInt(subscribeTags[subscribeTags.length-1]);
+    console;
+    if (!isNaN(parseInt(subscribeTags[subscribeTags.length - 1])))
+      subscribeId = parseInt(subscribeTags[subscribeTags.length - 1]);
   }
 
   console.timeEnd('Processed fic');
@@ -378,3 +367,18 @@ function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
     textDivHTML: textDiv.html() || '',
   };
 }
+
+// async function verifyAuth(client: AxiosInstance) {
+//   console.log(`Veriyfing Login Status for ${process.env.AO3_USERNAME}     `);
+//   const { request: checkRequest } = await client.get(
+//     `https://archiveofourown.org/users/${process.env.AO3_USERNAME}/preferences`,
+//   );
+
+//   if (checkRequest._redirectable._redirectCount > 0) {
+//     console.error('Failed to log in.');
+//     return false;
+//   }
+
+//   console.log('Login verified');
+//   return true;
+// }

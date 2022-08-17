@@ -79,6 +79,7 @@ body {
 }
 
 .navbar .username {
+  cursor: pointer;
   padding: 20px;
   font-size: 20px;
   color: var(--link-unvisited-color);

@@ -1,3 +1,4 @@
+import { useKBar } from 'kbar';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
@@ -10,6 +11,16 @@ export const NavBar: React.FC<any> = () => {
   const [bottomBarShown, setBottomBarShown] = useState(false);
 
   const username = useSelector((state: RootState) => state.user.username);
+
+  const { query } = useKBar();
+
+  function openLogoutOption() {
+    (window as any).query = query;
+    query.toggle();
+    window.setTimeout(() => {
+      query.setSearch('logout');
+    }, 50);
+  }
 
   useEffect(() => {
     if (document) {
@@ -56,6 +67,7 @@ export const NavBar: React.FC<any> = () => {
         className={`navbar ${bottomBarEnabled ? 'bottom' : ''} ${
           bottomBarShown && bottomBarEnabled ? 'bottom-shown' : ''
         }`}
+        onClick={openLogoutOption}
       >
         <div className="username">{username || 'Anonymous'}</div>
         <DarkModeSwitch

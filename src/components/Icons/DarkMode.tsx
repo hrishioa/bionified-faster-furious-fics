@@ -5,13 +5,13 @@ import * as DarkMode from '@/animations/112979-dark-mode.json';
 
 export default function DarkModeIcon() {
   return (
-      <Lottie
-        animationData={DarkMode}
-        loop={true}
-        style={{
-          width: 50,
-          height: 50,
-        }}
-      />
+    <Lottie
+      animationData={DarkMode}
+      loop={true}
+      style={{
+        width: 50,
+        height: 50,
+      }}
+    />
   );
-};
+}

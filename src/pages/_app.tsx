@@ -4,7 +4,6 @@ import '@/styles/chapters.css';
 import '@/styles/ao3text.css';
 import '@/styles/funinput.scss';
 
-
 import type { AppProps } from 'next/app';
 import Script from 'next/script';
 import Head from 'next/head';

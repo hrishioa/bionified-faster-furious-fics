@@ -1,4 +1,3 @@
-import * as cheerio from 'cheerio';
 import { CSSProperties } from 'react';
 
 export type WorkInfo = {
@@ -11,8 +10,20 @@ export type WorkInfo = {
   workStats: WorkStats;
 };
 
+export const ALLOWED_COOKIES = [
+  '_otwarchive_session',
+  'user_credentials',
+  'remember_user_token',
+];
+
+
+export type FicLoadError = {
+  failed: true;
+  reason: 'AuthFailed' | 'FicNotFound' | 'InvalidFic';
+};
+
 export type ToolbarPosition = Partial<
-Pick<CSSProperties, 'top' | 'left' | 'right' | 'height' | 'width' | 'display'>
+  Pick<CSSProperties, 'top' | 'left' | 'right' | 'height' | 'width' | 'display'>
 >;
 
 export type AO3Work = {

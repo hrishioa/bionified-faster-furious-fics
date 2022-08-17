@@ -10,18 +10,75 @@ import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ALLOWED_COOKIES, getWorkId, loadWork } from 'utils/fics';
+import { getWorkId, loadWork } from 'utils/fics';
 import { getChapterScrollPosition } from 'utils/scroll';
-import { AO3Work } from 'utils/types';
+import { ALLOWED_COOKIES, AO3Work } from 'utils/types';
 import debounce from 'lodash/debounce';
 import { setUsername } from '@/components/Redux-Store/UserSlice';
 import Head from 'next/head';
 import { NavBar } from '@/components/Navbar';
-import { CommandBar } from '@/components/CommandBar/CommandBar';
-import cookies from 'next-cookies';
+import { useRegisterActions } from 'kbar';
+import { Subscribe, Unsubscribe } from '@/components/Icons';
+
+function useSubscribeActions(work: AO3Work) {
+  useRegisterActions([
+    (work.meta.subscribeId ? {
+      id: 'unsubscribe',
+      name: 'Unsubscribe (Work In Progress)',
+      icon: <><Unsubscribe /></>,
+      keywords: 'unsubscribe',
+      perform: async () => {
+        const response = await window.fetch('/api/subscribe', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: work.meta.username,
+            authenticityToken: work.meta.authenticityToken,
+            workId: work.meta.id,
+            type: 'unsubscribe',
+            subscriptionId: work.meta.subscribeId,
+          })
+        });
+
+        console.log('Unsubscribe got status ',response.status);
+
+        const data = await response.json();
+        console.log('Got data ',data);
+      },
+      section: 'Work'
+    }: {
+      id: 'subscribe',
+      name: 'Subscribe (Work In Progress)',
+      icon: <><Subscribe /></>,
+      perform: async () => {
+        const response = await window.fetch('/api/subscribe', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: work.meta.username,
+            authenticityToken: work.meta.authenticityToken,
+            workId: work.meta.id,
+            type: 'subscribe',
+          })
+        });
+
+        console.log('Subscribe got status ',response.status);
+
+        const data = await response.json();
+        console.log('Got data ',data);
+      },
+      keywords: 'subscribe',
+      section: 'Work'
+    })
+  ])
+}
 
 const WorkPage = (props: {
-  work: AO3Work | null;
+  work: AO3Work;
   cookies: string[] | null;
   selectedChapter: number | null;
 }) => {
@@ -34,6 +91,8 @@ const WorkPage = (props: {
   useEffect(() => {
     dispatch(setUsername(work?.meta.username || null));
   }, [work, dispatch]);
+
+  useSubscribeActions(work);
 
   useEffect(() => {
     const saveScrollPosition = debounce(() => {
@@ -100,7 +159,7 @@ const WorkPage = (props: {
     <>
       <NavBar />
       <Head>
-        <title>{(work?.meta.title+' - BF3') || 'FuriousFics'}</title>
+        <title>{work?.meta.title + ' - BF3' || 'FuriousFics'}</title>
       </Head>
       <div>
         {work?.chapters.map((chapter) => (
@@ -145,20 +204,38 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     );
     if (!workId)
       return {
-        props: {
-          work: null,
-        },
-      };
+          redirect: {
+            permanent: false,
+            destination: '/login?ficnotfound=true',
+          },
+        };
 
-    if(allowedCookies.length < 2) {
+    if (allowedCookies.length < 2) {
       return {
         redirect: {
           permanent: false,
-          destination: `/login?when_successful=${ctx.resolvedUrl}`
-        }
-      }
+          destination: `/login?when_successful=${ctx.resolvedUrl}`,
+        },
+      };
     }
     const workData = await loadWork(workId, allowedCookies);
+
+    if ('failed' in workData) {
+      if (workData.reason === 'AuthFailed')
+        return {
+          redirect: {
+            permanent: false,
+            destination: `/login?when_successful=${ctx.resolvedUrl}`,
+          },
+        };
+      else
+        return {
+          redirect: {
+            permanent: false,
+            destination: '/login?ficnotfound=true',
+          },
+        };
+    }
 
     return {
       props: {
@@ -169,8 +246,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     };
   } else {
     return {
-      props: {
-        work: null,
+      redirect: {
+        permanent: false,
+        destination: '/login?ficnotfound=true',
       },
     };
   }

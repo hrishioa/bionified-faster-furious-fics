@@ -1,12 +1,12 @@
 import React from 'react';
 import Lottie from 'lottie-react';
 
-import * as BadCat from '@/animations/87174-bad-cat.json';
+import * as Unsubscribe from '@/animations/12999-unsubscribe.json';
 
-export default function BadCatIcon() {
+export default function UnsubscribeIcon() {
   return (
     <Lottie
-      animationData={BadCat}
+      animationData={Unsubscribe}
       loop={true}
       style={{
         width: 50,
