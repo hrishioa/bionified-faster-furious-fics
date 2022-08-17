@@ -22,7 +22,10 @@ export default function Login() {
           body: JSON.stringify(values),
         });
         const data = await response.json();
-        console.log("Got data ",data);
+        console.log('Got data ', data);
+        if(data.success && data.cookies && data.cookies.length) {
+          (data.cookies as string[]).map(cookie => document.cookie = cookie.replace(/HttpOnly/i, ''));
+        }
         if (!data.success) {
           setFailed(true);
         } else {
@@ -50,8 +53,9 @@ export default function Login() {
         <div className="login-container">
           <div className="title">Login to BF3</div>
           <form id="loginForm" className="form" onSubmit={handleSubmit}>
-            <div className="inputField">
+            <div className={`inputField ${failed ? 'error' : ''}`}>
               <input
+                autoCorrect="off" autoCapitalize="none"
                 type="text"
                 name="username"
                 disabled={isSubmitting}
@@ -61,8 +65,9 @@ export default function Login() {
                 onBlur={handleBlur}
               />
             </div>
-            <div className="inputField">
+            <div className={`inputField ${failed ? 'error' : ''}`}>
               <input
+                autoCorrect="off" autoCapitalize="none"
                 type="password"
                 disabled={isSubmitting}
                 name="password"

@@ -46,14 +46,22 @@ export async function authenticate(credentials?: {
       return null;
     }
 
+    // TODO: Remove later
+    if(!credentials)
+      credentials = {
+        username: (process.env.AO3_USERNAME as string),
+        password: (process.env.AO3_PASSWORD as string)
+      }
+
     const params = new URLSearchParams({
       authenticity_token: authenticityToken as string,
-      'user[login]': credentials?.username || (process.env.AO3_USERNAME as string),
-      'user[password]': credentials?.password || (process.env.AO3_PASSWORD as string),
-      'user[remember_me]': '1'
+      'user[login]': credentials.username,
+      'user[password]': credentials.password,
+      'user[remember_me]': '1',
+      'commit': 'Log In'
     });
 
-    // console.log('Params - ', params);
+    console.log('Params - ', params);
 
     console.time(`${runTag} - Logging in                `);
     const { status: authStatus, request: authRequest } = await client.post(
@@ -66,12 +74,14 @@ export async function authenticate(credentials?: {
       },
     );
 
+    console.log('authStatus - ',authStatus,', redirectcount - ',)
+
     if (
       !(
         authRequest._redirectable._redirectCount > 0 &&
         authStatus == 200 &&
         authRequest._redirectable._options.href ===
-          `https://archiveofourown.org/users/${process.env.AO3_USERNAME}`
+          `https://archiveofourown.org/users/${credentials.username}`
       )
     ) {
       console.error('Credentials did not work.'); // Add more info here
