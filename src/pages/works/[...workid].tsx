@@ -1,6 +1,6 @@
 import { MemoizedChapter } from '@/components/Chapter';
 import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChaptersInMenu';
-import { RootState } from '@/components/Redux-Store/ReduxStore';
+import { RootState, useAppStoreSelector } from '@/components/Redux-Store/ReduxStore';
 import {
   setChapterMeta,
   setCurrentChapter,
@@ -87,6 +87,8 @@ const WorkPage = (props: {
   const jumpToChapter = useSelector(
     (state: RootState) => state.work.jumpToChapter,
   );
+
+  console.log('component got cookies ',cookies);
 
   useEffect(() => {
     dispatch(setUsername(work?.meta.username || null));
@@ -236,6 +238,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
           },
         };
     }
+
+    console.log('Serverside props got cookies ',workData?.cookies);
 
     return {
       props: {

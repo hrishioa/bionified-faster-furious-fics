@@ -3,7 +3,14 @@ import * as cheerio from 'cheerio';
 import * as dotenv from 'dotenv';
 import * as ToughCookie from 'tough-cookie';
 import * as ACSupport from 'axios-cookiejar-support';
-import { AO3Chapter, AO3Work, FicLoadError, WorkMeta, WorkStats, workTags } from './types';
+import {
+  AO3Chapter,
+  AO3Work,
+  FicLoadError,
+  WorkMeta,
+  WorkStats,
+  workTags,
+} from './types';
 
 dotenv.config({ path: __dirname + '../.env' });
 
@@ -23,6 +30,7 @@ export async function authenticate(credentials: {
 }): Promise<{
   client: AxiosInstance;
   cookieJar: ToughCookie.CookieJar;
+  userAuthToken: string;
 } | null> {
   const runTag = getTimeTag();
 
@@ -43,13 +51,6 @@ export async function authenticate(credentials: {
       console.error('Authentication failure - ', loginPageStatus);
       return null;
     }
-
-    // TODO: Remove later
-    if (!credentials)
-      credentials = {
-        username: process.env.AO3_USERNAME as string,
-        password: process.env.AO3_PASSWORD as string,
-      };
 
     const params = new URLSearchParams({
       authenticity_token: authenticityToken as string,
@@ -85,8 +86,19 @@ export async function authenticate(credentials: {
 
     console.timeEnd(`${runTag} - Authenticated             `);
 
+    console.time(`${runTag} - Getting authenticity_token`);
+    const { data: authTokenData } = await client.get(
+      `https://archiveofourown.org/users/${credentials.username}`,
+    );
+
+    const authTokenDOM = cheerio.load(authTokenData);
+
+    const userAuthToken = authTokenDOM('[name=authenticity_token]').val();
+
     return {
       client,
+      userAuthToken:
+        (Array.isArray(userAuthToken) ? userAuthToken[0] : userAuthToken) || '',
       cookieJar: jar,
     };
   } catch (err) {
@@ -118,7 +130,7 @@ export async function loadWork(
     client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
   } else {
     console.log('No cookies found');
-    return {failed: true, reason: 'AuthFailed'};
+    return { failed: true, reason: 'AuthFailed' };
   }
 
   const runTag = getTimeTag();
@@ -138,11 +150,11 @@ export async function loadWork(
       else return null;
     });
 
-  if(!workData)
+  if (!workData)
     return {
       failed: true,
-      reason: 'InvalidFic'
-    }
+      reason: 'InvalidFic',
+    };
 
   console.timeEnd(`${runTag} - Loading fic ${workId}`);
 
@@ -153,7 +165,7 @@ export async function loadWork(
       console.log('Skipping because we already retried');
       return {
         failed: true,
-        reason: 'AuthFailed'
+        reason: 'AuthFailed',
       };
     }
   }
@@ -177,9 +189,16 @@ export async function loadWork(
     console.error('Could not find fic');
     return {
       failed: true,
-      reason: 'FicNotFound'
+      reason: 'FicNotFound',
     };
   }
+
+  console.log(
+    'Got cookies from work ',
+    await cookieJar.getSetCookieStrings('https://archiveofourown.org/'),
+    ', also - ',
+    await cookieJar.getSetCookieStrings('https://archiveofourown.org/works/9848762?view_adult=true&view_full_work=true')
+  );
 
   return {
     work: processedWork,

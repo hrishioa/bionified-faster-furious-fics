@@ -3,12 +3,17 @@ import * as CatAnimation from '@/animations/78625-le-petit-chat-cat-noir.json';
 import Lottie, { LottieRef } from 'lottie-react';
 import { Formik } from 'formik';
 import { ALLOWED_COOKIES } from 'utils/types';
+import { useRouter } from 'next/router';
+import { useAppStoreDispatch } from '@/components/Redux-Store/ReduxStore';
+import { login, logout } from '@/components/Redux-Store/UserSlice';
 
 export default function Login() {
   const animationRef: LottieRef = useRef(null);
   const [showCat, setShowCat] = useState(false);
   const [failed, setFailed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter();
+  const dispatch = useAppStoreDispatch();
 
   useEffect(() => {
     function getQueryParams() {
@@ -26,6 +31,7 @@ export default function Login() {
       console.log('Effecting logout...');
       ALLOWED_COOKIES.map(cookie => deleteCookie(cookie));
       setErrorMessage('Logged out.');
+      dispatch(logout());
     }
 
     if(query.ficnotfound && query.ficnotfound === 'true') {
@@ -53,14 +59,18 @@ export default function Login() {
             (cookie) => (document.cookie = cookie.replace(/HttpOnly/i, '')),
           );
 
+          dispatch(login({username: data.username, authenticity_token: data.userAuthToken}));
+
           const queryParams = Object.fromEntries(
             new URLSearchParams(window.location.search).entries(),
           );
-          if (queryParams.when_successful)
-            window.location.pathname = queryParams.when_successful;
+          if (queryParams.when_successful) {
+            router.push(queryParams.when_successful);
+          }
         }
         if (!data.success) {
           setFailed(true);
+          values.password = '';
         } else {
           console.log('Logged in successfully');
         }
@@ -93,6 +103,7 @@ export default function Login() {
                 autoCapitalize="none"
                 type="text"
                 name="username"
+                autoFocus={true}
                 disabled={isSubmitting}
                 placeholder="Username"
                 value={values.username}

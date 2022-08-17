@@ -26,9 +26,9 @@ export default async function handler(
       });
 
     const data: { [key: string]: string } = {
-      authenticity_token: req.body.authenticityToken,
-      'subscription[subscribable_id]': req.body.workId,
-      'subscription[subscribable_type': 'WORK',
+      authenticity_token: String(req.body.authenticityToken),
+      'subscription[subscribable_id]': String(req.body.workId),
+      'subscription[subscribable_type]': 'Work',
     };
 
     if (req.body.type !== 'unsubscribe' && req.body.type !== 'subscribe')
@@ -76,11 +76,13 @@ export default async function handler(
       data: subData,
       status: subStatus,
       request: subRequest,
-    } = await client.post(url, data);
+    } = await client.post(url, new URLSearchParams(data), {
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    });
 
-    console.log('subRequest - ',subRequest);
-    console.log('subData - ',subData);
-    console.log('subStatus - ',subStatus);
+    console.log('subRequest - ', subRequest);
+    console.log('subData - ', subData);
+    console.log('subStatus - ', subStatus);
 
     return res.status(200).json({
       success: true,
