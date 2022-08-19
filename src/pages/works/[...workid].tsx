@@ -77,8 +77,6 @@ const WorkPage = (props: {
 
   useEffect(() => {
     (window as any).work = work;
-
-    console.log('Checking and loading cookies...');
     if (cookies) {
       cookies.map(
         (cookie) => (document.cookie = cookie.replace(/HttpOnly/i, '')),

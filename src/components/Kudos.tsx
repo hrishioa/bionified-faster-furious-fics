@@ -18,7 +18,6 @@ export default function Kudos() {
     }
 
     if(workId && authenticityToken) {
-      console.log('Calling kudos api...');
       window.fetch('/api/kudos', {
         method: 'POST',
         headers: {

@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ALLOWED_COOKIES } from 'utils/types';
 import * as ToughCookie from 'tough-cookie';
 import * as ACSupport from 'axios-cookiejar-support';
+import { getCookiedClient } from 'utils/auth';
 
 export default async function handler(
   req: NextApiRequest,
@@ -45,19 +46,13 @@ export default async function handler(
       url += `/${req.body.subscriptionId}`;
     }
 
-    const allowedCookies = ALLOWED_COOKIES.reduce((acc, cur) => {
-      const cookie = req.cookies[cur];
-      if (cookie) acc.push(`${cur}=${encodeURIComponent(cookie)}`);
-      return acc;
-    }, [] as string[]);
+    const client = getCookiedClient(req.cookies);
 
-    const cookieJar = new ToughCookie.CookieJar();
-
-    allowedCookies.map((cookie) =>
-      cookieJar.setCookieSync(cookie, 'https://archiveofourown.org'),
-    );
-
-    const client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
+    if(!client)
+      return res.status(200).json({
+        success: false,
+        message: 'Not enough data to authenticate.'
+      })
 
     const {
       data: subData,
@@ -71,7 +66,7 @@ export default async function handler(
       },
     });
 
-    if (subRequest._redirectable._redirectCount > 0 || subStatus !== 201) {
+    if (subRequest._redirectable._redirectCount > 0 || (subStatus !== 201 && subStatus != 200)) {
       return res.status(200).json({
         success: false,
         message: `Could not ${req.body.type}.`,

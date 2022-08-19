@@ -28,7 +28,6 @@ const workSlice = createSlice({
       if (state.workInfo) state.workInfo.subscribeId = action.payload;
     },
     setWorkInfo: (state, action: PayloadAction<WorkInfo>) => {
-      console.log('Setting work info to ', action.payload);
       state.workInfo = action.payload;
     },
     setCurrentChapter: (state, action: PayloadAction<number>) => {
