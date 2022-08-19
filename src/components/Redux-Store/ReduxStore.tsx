@@ -2,9 +2,7 @@ import React from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 import workReducer from './WorksSlice';
 import userReducer from './UserSlice';
-import {
-  Provider,
-} from 'react-redux';
+import { Provider } from 'react-redux';
 
 export type ReduxStoreProps = {
   children?: JSX.Element | JSX.Element[];

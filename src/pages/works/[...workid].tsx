@@ -1,8 +1,6 @@
 import { MemoizedChapter } from '@/components/Chapter';
 import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChaptersInMenu';
-import {
-  RootState
-} from '@/components/Redux-Store/ReduxStore';
+import { RootState } from '@/components/Redux-Store/ReduxStore';
 import {
   setChapterMeta,
   setCurrentChapter,

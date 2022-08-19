@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { stringify } from 'querystring';
 
 export type UserState = {
   username: string | null;

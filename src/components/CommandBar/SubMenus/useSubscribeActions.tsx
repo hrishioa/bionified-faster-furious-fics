@@ -1,16 +1,14 @@
 import { Subscribe, Unsubscribe } from '@/components/Icons';
-import { useAppStoreDispatch, useAppStoreSelector } from '@/components/Redux-Store/hooks';
-import { appStore, ReduxStore } from '@/components/Redux-Store/ReduxStore';
+import { useAppStoreSelector } from '@/components/Redux-Store/hooks';
+import { appStore } from '@/components/Redux-Store/ReduxStore';
 import { setSubscribeStatus } from '@/components/Redux-Store/WorksSlice';
-import { useKBar, useRegisterActions } from 'kbar';
-import React, { useEffect, useState } from 'react';
+import { useKBar } from 'kbar';
+import React, { useEffect } from 'react';
 
 export default function useSubscribeActions() {
   const { query } = useKBar();
 
   const workInfo = useAppStoreSelector((state) => state.work.workInfo);
-
-  console.log('loading subscribe actions, workinfo is ', workInfo);
 
   useEffect(() => {
     const subAction =
@@ -79,9 +77,18 @@ export default function useSubscribeActions() {
                 const data = await response.json();
                 console.log('Got data ', data);
 
-                if(data.success && data.subscriptionId && !isNaN(parseInt(data.subscriptionId)))
-                  console.log('Setting subscribe status to ', parseInt(data.subscriptionId));
-                  appStore.dispatch(setSubscribeStatus(parseInt(data.subscriptionId)));
+                if (
+                  data.success &&
+                  data.subscriptionId &&
+                  !isNaN(parseInt(data.subscriptionId))
+                )
+                  console.log(
+                    'Setting subscribe status to ',
+                    parseInt(data.subscriptionId),
+                  );
+                appStore.dispatch(
+                  setSubscribeStatus(parseInt(data.subscriptionId)),
+                );
               },
               keywords: 'subscribe',
               section: 'Work',
@@ -89,15 +96,11 @@ export default function useSubscribeActions() {
       ]) ||
       null;
 
-    console.log('Sub action is ', subAction);
-
-    const deregisterExistingActions = subAction && query.registerActions(subAction) || null;
+    const deregisterExistingActions =
+      (subAction && query.registerActions(subAction)) || null;
 
     return () => {
-      if(deregisterExistingActions)
-        deregisterExistingActions();
-    }
+      if (deregisterExistingActions) deregisterExistingActions();
+    };
   }, [query, workInfo]);
-
-  // useRegisterActions(subAction);
 }

@@ -1,4 +1,4 @@
-import { ChapterIcon, PagesFlipping } from '@/components/Icons';
+import { PagesFlipping } from '@/components/Icons';
 import { jumpToChapter } from '@/components/Redux-Store/WorksSlice';
 import { ActionImpl, useRegisterActions } from 'kbar';
 import { useDispatch } from 'react-redux';

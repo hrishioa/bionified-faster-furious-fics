@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
 import * as cheerio from 'cheerio';
-import * as dotenv from 'dotenv';
 import * as ToughCookie from 'tough-cookie';
 import * as ACSupport from 'axios-cookiejar-support';
 import {
@@ -11,8 +10,6 @@ import {
   WorkStats,
   workTags,
 } from './types';
-
-dotenv.config({ path: __dirname + '../.env' });
 
 function getTimeTag() {
   return (Math.random() + 1).toString(36).substring(7);
@@ -379,18 +376,3 @@ function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
     textDivHTML: textDiv.html() || '',
   };
 }
-
-// async function verifyAuth(client: AxiosInstance) {
-//   console.log(`Veriyfing Login Status for ${process.env.AO3_USERNAME}     `);
-//   const { request: checkRequest } = await client.get(
-//     `https://archiveofourown.org/users/${process.env.AO3_USERNAME}/preferences`,
-//   );
-
-//   if (checkRequest._redirectable._redirectCount > 0) {
-//     console.error('Failed to log in.');
-//     return false;
-//   }
-
-//   console.log('Login verified');
-//   return true;
-// }

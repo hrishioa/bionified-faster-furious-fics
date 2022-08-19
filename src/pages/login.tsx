@@ -38,6 +38,7 @@ export default function Login() {
     if (query.ficnotfound && query.ficnotfound === 'true') {
       setErrorMessage('Fic not found. You may not have access.');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -91,8 +92,6 @@ export default function Login() {
     >
       {({
         values,
-        errors,
-        touched,
         handleChange,
         handleBlur,
         handleSubmit,
