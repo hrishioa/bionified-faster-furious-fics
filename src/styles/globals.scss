@@ -115,3 +115,26 @@ a {
   position: absolute;
   background-color: hsl(11deg 100% 42% / 75%);
 }
+
+.kudos-icon {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Cinzel Decorative', Arial, Helvetica, sans-serif;
+  cursor: pointer;
+
+  .kudos-count {
+    margin: auto;
+    margin-top: -25px;
+  }
+
+  &:hover {
+    .kudos-count {
+      filter: drop-shadow(2px 2px 2px #4444dd);
+    }
+
+    .kudos-lottie {
+      transform: scale(0.8);
+    }
+  }
+
+}

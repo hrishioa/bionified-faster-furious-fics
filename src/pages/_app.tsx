@@ -1,4 +1,4 @@
-import '@/styles/globals.css';
+import '@/styles/globals.scss';
 import '@/styles/commandbar.css';
 import '@/styles/chapters.css';
 import '@/styles/ao3text.css';

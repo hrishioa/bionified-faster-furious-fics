@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DarkModeSwitch } from 'react-toggle-dark-mode';
 import { CommandBarIcon } from './CommandBar/CommandBarIcon';
+import Kudos from './Kudos';
 import { RootState } from './Redux-Store/ReduxStore';
 
 export const NavBar: React.FC<any> = () => {
@@ -71,6 +72,7 @@ export const NavBar: React.FC<any> = () => {
         <div className="username" onClick={openLogoutOption}>
           {username || 'Anonymous'}
         </div>
+        <Kudos />
         <DarkModeSwitch
           checked={theme === 'dark'}
           style={{

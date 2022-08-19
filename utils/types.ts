@@ -3,6 +3,7 @@ import { CSSProperties } from 'react';
 export type WorkInfo = {
   id: number;
   title: string;
+  kudos: number;
   username: string | null;
   authenticityToken: string;
   subscribeId: number | null;

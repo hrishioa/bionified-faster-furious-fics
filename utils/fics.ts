@@ -203,7 +203,7 @@ function getUsernameFromWork(workDOM: cheerio.CheerioAPI): string | null {
   const greetingDiv = workDOM('div#greeting');
   if (!greetingDiv.length) return username;
 
-  const greetingLinks = greetingDiv
+  greetingDiv
     .find('a')
     .toArray()
     .forEach((link) => {
@@ -257,6 +257,9 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
       subscribeId = parseInt(subscribeTags[subscribeTags.length - 1]);
   }
 
+  const kudos = parseInt(workDOM('dd.kudos').text());
+
+
   console.timeEnd('Processed fic');
 
   return {
@@ -265,6 +268,7 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
       username: null,
       id: workId,
       subscribeId,
+      kudos: !isNaN(kudos) ? kudos : 0,
       authenticityToken,
       workMeta,
       workStats,

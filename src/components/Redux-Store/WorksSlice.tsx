@@ -37,6 +37,10 @@ const workSlice = createSlice({
     jumpToChapter: (state, action: PayloadAction<number | null>) => {
       state.jumpToChapter = action.payload;
     },
+    addKudos: (state) => {
+      if(state.workInfo)
+        state.workInfo.kudos = state.workInfo.kudos ? state.workInfo.kudos+1 : 1;
+    },
     setScroll: (
       state,
       action: PayloadAction<{ chapterId: number; scrollPercentage: number }>,
@@ -54,5 +58,6 @@ export const {
   setScroll,
   jumpToChapter,
   setWorkInfo,
+  addKudos
 } = workSlice.actions;
 export default workSlice.reducer;

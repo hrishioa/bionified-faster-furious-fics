@@ -71,10 +71,10 @@ export default function Login() {
             new URLSearchParams(window.location.search).entries(),
           );
 
-          console.log('query params are ',queryParams);
+          console.log('query params are ', queryParams);
 
           if (queryParams.when_successful) {
-            console.log('going to ',queryParams.when_successful);
+            console.log('going to ', queryParams.when_successful);
             setSuccessLoading(true);
             router.push(queryParams.when_successful);
           }
@@ -102,12 +102,16 @@ export default function Login() {
         isSubmitting,
         /* and other goodies */
       }) => (
-        <div className={`login-container ${(isSubmitting || successLoading) && 'login-disable' || ''}`}>
-          {
-            (isSubmitting || successLoading) && <div className='login-loader-background'>
-              <div className='loader login-loader'></div>
+        <div
+          className={`login-container ${
+            ((isSubmitting || successLoading) && 'login-disable') || ''
+          }`}
+        >
+          {(isSubmitting || successLoading) && (
+            <div className="login-loader-background">
+              <div className="loader login-loader"></div>
             </div>
-          }
+          )}
           <div className="title">Login to BF3</div>
           {errorMessage && <div className="subtitle">{errorMessage}</div>}
           <form id="loginForm" className="form" onSubmit={handleSubmit}>

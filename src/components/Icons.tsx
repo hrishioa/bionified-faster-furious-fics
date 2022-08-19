@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { Suspense } from 'react';
+import { HeartProps } from 'utils/types';
 
 const DarkModeIconBase = dynamic<any>(() => import('./Icons/DarkMode'), {
   suspense: true,

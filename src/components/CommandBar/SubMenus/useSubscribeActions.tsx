@@ -17,7 +17,7 @@ export default function useSubscribeActions() {
           ? {
               id: 'sub',
               priority: 0,
-              name: 'Unsubscribe (Work In Progress)',
+              name: 'Unsubscribe',
               icon: (
                 <>
                   <Unsubscribe />
@@ -52,7 +52,7 @@ export default function useSubscribeActions() {
           : {
               id: 'sub',
               priority: 0,
-              name: 'Subscribe (Work In Progress)',
+              name: 'Subscribe',
               icon: (
                 <>
                   <Subscribe />
