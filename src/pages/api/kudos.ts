@@ -34,13 +34,13 @@ export default async function handler(
     const url = 'https://archiveofourown.org/kudos.js';
 
     try {
-      await client.post(url, new URLSearchParams(data), {headers});
-    } catch(err) {
+      await client.post(url, new URLSearchParams(data), { headers });
+    } catch (err) {
       // console.error(err);
       return res.status(200).json({
         success: false,
-        message: 'Kudos probably already left!'
-      })
+        message: 'Kudos probably already left!',
+      });
     }
 
     return res.status(200).json({

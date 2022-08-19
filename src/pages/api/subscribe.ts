@@ -1,8 +1,4 @@
-import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ALLOWED_COOKIES } from 'utils/types';
-import * as ToughCookie from 'tough-cookie';
-import * as ACSupport from 'axios-cookiejar-support';
 import { getCookiedClient } from 'utils/auth';
 
 export default async function handler(
@@ -48,11 +44,11 @@ export default async function handler(
 
     const client = getCookiedClient(req.cookies);
 
-    if(!client)
+    if (!client)
       return res.status(200).json({
         success: false,
-        message: 'Not enough data to authenticate.'
-      })
+        message: 'Not enough data to authenticate.',
+      });
 
     const {
       data: subData,
@@ -66,7 +62,10 @@ export default async function handler(
       },
     });
 
-    if (subRequest._redirectable._redirectCount > 0 || (subStatus !== 201 && subStatus != 200)) {
+    if (
+      subRequest._redirectable._redirectCount > 0 ||
+      (subStatus !== 201 && subStatus != 200)
+    ) {
       return res.status(200).json({
         success: false,
         message: `Could not ${req.body.type}.`,
