@@ -48,21 +48,20 @@ export default async function handler(
     }
 
     console.log('Got cookies - ', req.cookies);
-    console.log('Calling ', url, ' with ', data);
 
     const allowedCookies = ALLOWED_COOKIES.reduce((acc, cur) => {
       const cookie = req.cookies[cur];
-      if (cookie) acc.push(`${cur}=${cookie}`);
+      if (cookie) acc.push(`${cur}=${encodeURIComponent(cookie)}`);
       return acc;
     }, [] as string[]);
 
     console.log('Allowed cookies - ', allowedCookies);
 
-    if (allowedCookies.length < 3)
-      return res.status(200).json({
-        success: false,
-        message: 'Not enough auth information.',
-      });
+    // if (allowedCookies.length < 3)
+    //   return res.status(200).json({
+    //     success: false,
+    //     message: 'Not enough auth information.',
+    //   });
 
     const cookieJar = new ToughCookie.CookieJar();
 
@@ -72,17 +71,30 @@ export default async function handler(
 
     const client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
 
+    console.log('Calling ', url, ' with ', data);
+
     const {
       data: subData,
       status: subStatus,
       request: subRequest,
     } = await client.post(url, new URLSearchParams(data), {
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'accept': 'application/json, text/javascript, */*; q=0.01',
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'x-requested-with': 'XMLHttpRequest'
+      },
     });
 
-    console.log('subRequest - ', subRequest);
-    console.log('subData - ', subData);
+    // console.log('subRequest - ', subRequest);
+    // console.log('subData - ', subData);
     console.log('subStatus - ', subStatus);
+
+
+    if(subRequest._redirectable._redirectCount > 0) {
+      console.log('Redirected, likely failed, redirected to ',subRequest._redirectable._currentUrl);
+    } else {
+      console.log('Seems to have subscribed - ',subData);
+    }
 
     return res.status(200).json({
       success: true,
