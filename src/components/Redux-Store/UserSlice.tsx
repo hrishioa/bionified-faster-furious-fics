@@ -8,7 +8,7 @@ export type UserState = {
 
 const initialUserState: UserState = {
   username: null,
-  authenticity_token: null
+  authenticity_token: null,
 };
 
 const userSlice = createSlice({
@@ -18,14 +18,17 @@ const userSlice = createSlice({
     setUsername: (state, action: PayloadAction<string | null>) => {
       state.username = action.payload;
     },
-    login: (state, action: PayloadAction<{username: string, authenticity_token: string}>) => {
+    login: (
+      state,
+      action: PayloadAction<{ username: string; authenticity_token: string }>,
+    ) => {
       state.username = action.payload.username;
       state.authenticity_token = action.payload.authenticity_token;
     },
     logout: (state) => {
       state.username = null;
       state.authenticity_token = null;
-    }
+    },
   },
 });
 

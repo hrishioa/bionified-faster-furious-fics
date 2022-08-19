@@ -193,13 +193,6 @@ export async function loadWork(
     };
   }
 
-  console.log(
-    'Got cookies from work ',
-    await cookieJar.getSetCookieStrings('https://archiveofourown.org/'),
-    ', also - ',
-    await cookieJar.getSetCookieStrings('https://archiveofourown.org/works/9848762?view_adult=true&view_full_work=true')
-  );
-
   return {
     work: processedWork,
     workDOM,

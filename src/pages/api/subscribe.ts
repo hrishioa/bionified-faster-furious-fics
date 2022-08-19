@@ -9,8 +9,6 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method === 'POST') {
-    console.log('subscribe endpoint got body ', req.body);
-
     if (!req.body.username || !req.body.authenticityToken)
       return res.status(200).json({
         success: false,
@@ -47,21 +45,11 @@ export default async function handler(
       url += `/${req.body.subscriptionId}`;
     }
 
-    console.log('Got cookies - ', req.cookies);
-
     const allowedCookies = ALLOWED_COOKIES.reduce((acc, cur) => {
       const cookie = req.cookies[cur];
       if (cookie) acc.push(`${cur}=${encodeURIComponent(cookie)}`);
       return acc;
     }, [] as string[]);
-
-    console.log('Allowed cookies - ', allowedCookies);
-
-    // if (allowedCookies.length < 3)
-    //   return res.status(200).json({
-    //     success: false,
-    //     message: 'Not enough auth information.',
-    //   });
 
     const cookieJar = new ToughCookie.CookieJar();
 
@@ -71,34 +59,30 @@ export default async function handler(
 
     const client = ACSupport.wrapper(axios.create({ jar: cookieJar }));
 
-    console.log('Calling ', url, ' with ', data);
-
     const {
       data: subData,
       status: subStatus,
       request: subRequest,
     } = await client.post(url, new URLSearchParams(data), {
       headers: {
-        'accept': 'application/json, text/javascript, */*; q=0.01',
+        accept: 'application/json, text/javascript, */*; q=0.01',
         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'x-requested-with': 'XMLHttpRequest'
+        'x-requested-with': 'XMLHttpRequest',
       },
     });
 
-    // console.log('subRequest - ', subRequest);
-    // console.log('subData - ', subData);
-    console.log('subStatus - ', subStatus);
-
-
-    if(subRequest._redirectable._redirectCount > 0) {
-      console.log('Redirected, likely failed, redirected to ',subRequest._redirectable._currentUrl);
-    } else {
-      console.log('Seems to have subscribed - ',subData);
+    if (subRequest._redirectable._redirectCount > 0 || subStatus !== 201) {
+      return res.status(200).json({
+        success: false,
+        message: `Could not ${req.body.type}.`,
+      });
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Work done.',
+      type: req.body.type,
+      subscriptionId: subData.item_id || undefined,
+      message: 'Completed.',
     });
   } else {
     return res.status(400);

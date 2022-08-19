@@ -1,10 +1,13 @@
 import { MemoizedChapter } from '@/components/Chapter';
 import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChaptersInMenu';
-import { RootState, useAppStoreSelector } from '@/components/Redux-Store/ReduxStore';
+import {
+  RootState
+} from '@/components/Redux-Store/ReduxStore';
 import {
   setChapterMeta,
   setCurrentChapter,
   setScroll,
+  setWorkInfo,
 } from '@/components/Redux-Store/WorksSlice';
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
@@ -17,65 +20,7 @@ import debounce from 'lodash/debounce';
 import { setUsername } from '@/components/Redux-Store/UserSlice';
 import Head from 'next/head';
 import { NavBar } from '@/components/Navbar';
-import { useRegisterActions } from 'kbar';
-import { Subscribe, Unsubscribe } from '@/components/Icons';
-
-function useSubscribeActions(work: AO3Work) {
-  useRegisterActions([
-    (work.meta.subscribeId ? {
-      id: 'unsubscribe',
-      name: 'Unsubscribe (Work In Progress)',
-      icon: <><Unsubscribe /></>,
-      keywords: 'unsubscribe',
-      perform: async () => {
-        const response = await window.fetch('/api/subscribe', {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: work.meta.username,
-            authenticityToken: work.meta.authenticityToken,
-            workId: work.meta.id,
-            type: 'unsubscribe',
-            subscriptionId: work.meta.subscribeId,
-          })
-        });
-
-        console.log('Unsubscribe got status ',response.status);
-
-        const data = await response.json();
-        console.log('Got data ',data);
-      },
-      section: 'Work'
-    }: {
-      id: 'subscribe',
-      name: 'Subscribe (Work In Progress)',
-      icon: <><Subscribe /></>,
-      perform: async () => {
-        const response = await window.fetch('/api/subscribe', {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: work.meta.username,
-            authenticityToken: work.meta.authenticityToken,
-            workId: work.meta.id,
-            type: 'subscribe',
-          })
-        });
-
-        console.log('Subscribe got status ',response.status);
-
-        const data = await response.json();
-        console.log('Got data ',data);
-      },
-      keywords: 'subscribe',
-      section: 'Work'
-    })
-  ])
-}
+import useSubscribeActions from '@/components/CommandBar/SubMenus/useSubscribeActions';
 
 const WorkPage = (props: {
   work: AO3Work;
@@ -88,13 +33,12 @@ const WorkPage = (props: {
     (state: RootState) => state.work.jumpToChapter,
   );
 
-  console.log('component got cookies ',cookies);
-
   useEffect(() => {
+    dispatch(setWorkInfo(work.meta));
     dispatch(setUsername(work?.meta.username || null));
-  }, [work, dispatch]);
+  }, [dispatch, work.meta]);
 
-  useSubscribeActions(work);
+  useSubscribeActions();
 
   useEffect(() => {
     const saveScrollPosition = debounce(() => {
@@ -135,10 +79,6 @@ const WorkPage = (props: {
 
   useEffect(() => {
     (window as any).work = work;
-
-    console.log(
-      `Loaded ${work?.chapters.length} chapters for work ${work?.meta.title}`,
-    );
 
     console.log('Checking and loading cookies...');
     if (cookies) {
@@ -206,11 +146,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     );
     if (!workId)
       return {
-          redirect: {
-            permanent: false,
-            destination: '/login?ficnotfound=true',
-          },
-        };
+        redirect: {
+          permanent: false,
+          destination: '/login?ficnotfound=true',
+        },
+      };
 
     if (allowedCookies.length < 2) {
       return {
@@ -238,8 +178,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
           },
         };
     }
-
-    console.log('Serverside props got cookies ',workData?.cookies);
 
     return {
       props: {

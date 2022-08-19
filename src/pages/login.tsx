@@ -4,7 +4,7 @@ import Lottie, { LottieRef } from 'lottie-react';
 import { Formik } from 'formik';
 import { ALLOWED_COOKIES } from 'utils/types';
 import { useRouter } from 'next/router';
-import { useAppStoreDispatch } from '@/components/Redux-Store/ReduxStore';
+import { useAppStoreDispatch } from '@/components/Redux-Store/hooks';
 import { login, logout } from '@/components/Redux-Store/UserSlice';
 
 export default function Login() {
@@ -23,18 +23,19 @@ export default function Login() {
     }
 
     function deleteCookie(name: string) {
-      document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie =
+        name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
 
     const query = getQueryParams();
-    if(query.logout && query.logout === 'true') {
+    if (query.logout && query.logout === 'true') {
       console.log('Effecting logout...');
-      ALLOWED_COOKIES.map(cookie => deleteCookie(cookie));
+      ALLOWED_COOKIES.map((cookie) => deleteCookie(cookie));
       setErrorMessage('Logged out.');
       dispatch(logout());
     }
 
-    if(query.ficnotfound && query.ficnotfound === 'true') {
+    if (query.ficnotfound && query.ficnotfound === 'true') {
       setErrorMessage('Fic not found. You may not have access.');
     }
   }, []);
@@ -59,7 +60,12 @@ export default function Login() {
             (cookie) => (document.cookie = cookie.replace(/HttpOnly/i, '')),
           );
 
-          dispatch(login({username: data.username, authenticity_token: data.userAuthToken}));
+          dispatch(
+            login({
+              username: data.username,
+              authenticity_token: data.userAuthToken,
+            }),
+          );
 
           const queryParams = Object.fromEntries(
             new URLSearchParams(window.location.search).entries(),
@@ -95,7 +101,7 @@ export default function Login() {
       }) => (
         <div className="login-container">
           <div className="title">Login to BF3</div>
-          {errorMessage && <div className='subtitle'>{errorMessage}</div>}
+          {errorMessage && <div className="subtitle">{errorMessage}</div>}
           <form id="loginForm" className="form" onSubmit={handleSubmit}>
             <div className={`inputField ${failed ? 'error' : ''}`}>
               <input
