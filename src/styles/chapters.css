@@ -10,6 +10,7 @@
   line-height: 1.7;
   /* font-family: 'IBM Plex Serif' */
   font-family: Cinzel Decorative;
+  cursor: pointer;
 }
 
 .text-selected {

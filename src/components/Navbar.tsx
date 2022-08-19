@@ -67,9 +67,10 @@ export const NavBar: React.FC<any> = () => {
         className={`navbar ${bottomBarEnabled ? 'bottom' : ''} ${
           bottomBarShown && bottomBarEnabled ? 'bottom-shown' : ''
         }`}
-        onClick={openLogoutOption}
       >
-        <div className="username">{username || 'Anonymous'}</div>
+        <div className="username" onClick={openLogoutOption}>
+          {username || 'Anonymous'}
+        </div>
         <DarkModeSwitch
           checked={theme === 'dark'}
           style={{
