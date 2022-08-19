@@ -20,7 +20,7 @@
   --link-visited-color: hsl(333deg 100% 43%);
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --body-bg-color: #333336;
   --text-color: rgb(228, 228, 228);
   --cb-background: rgb(84, 84, 84);
@@ -30,7 +30,7 @@
   --cb-foreground: rgba(252 252 252 / 0.9);
   --cb-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
   --rest-color: hsl(0deg 0% 70%);
-  --cb-overlay-color: rgba(0, 0, 0, .5);
+  --cb-overlay-color: rgba(0, 0, 0, 0.5);
   --cb-transparent-background: rgba(84, 84, 84, 0.45);
   --cb-placeholder-color: rgb(153, 153, 153);
   --highlight-background: rgb(3, 189, 189);
@@ -40,7 +40,7 @@
   --link-visited-color: hsl(333deg 100% 38%);
 }
 
-[data-theme="blue"] {
+[data-theme='blue'] {
   --body-bg-color: rgb(0, 30, 60);
   --text-color: hsl(210deg 13% 90%);
   --cb-background: hsl(214deg 17% 26%);
@@ -50,7 +50,7 @@
   --cb-foreground: rgba(252 252 252 / 0.9);
   --cb-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
   --rest-color: hsl(210deg 16% 66%);
-  --cb-overlay-color: rgba(0, 0, 0, .5);
+  --cb-overlay-color: rgba(0, 0, 0, 0.5);
   --cb-transparent-background: rgba(84, 84, 84, 0.45);
   --cb-placeholder-color: rgb(153, 153, 153);
   --highlight-background: orange;

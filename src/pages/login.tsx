@@ -11,6 +11,7 @@ export default function Login() {
   const animationRef: LottieRef = useRef(null);
   const [showCat, setShowCat] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [successLoading, setSuccessLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
   const dispatch = useAppStoreDispatch();
@@ -46,7 +47,6 @@ export default function Login() {
       initialValues={{ username: '', password: '' }}
       onSubmit={async (values, { setSubmitting }) => {
         setFailed(false);
-        console.log('Submitting form with ', values);
         const response = await window.fetch('/api/login', {
           method: 'POST',
           headers: {
@@ -55,7 +55,6 @@ export default function Login() {
           body: JSON.stringify(values),
         });
         const data = await response.json();
-        console.log('Got data ', data);
         if (data.success && data.cookies && data.cookies.length) {
           (data.cookies as string[]).map(
             (cookie) => (document.cookie = cookie.replace(/HttpOnly/i, '')),
@@ -71,7 +70,12 @@ export default function Login() {
           const queryParams = Object.fromEntries(
             new URLSearchParams(window.location.search).entries(),
           );
+
+          console.log('query params are ',queryParams);
+
           if (queryParams.when_successful) {
+            console.log('going to ',queryParams.when_successful);
+            setSuccessLoading(true);
             router.push(queryParams.when_successful);
           }
         }
@@ -98,7 +102,12 @@ export default function Login() {
         isSubmitting,
         /* and other goodies */
       }) => (
-        <div className="login-container">
+        <div className={`login-container ${(isSubmitting || successLoading) && 'login-disable' || ''}`}>
+          {
+            (isSubmitting || successLoading) && <div className='login-loader-background'>
+              <div className='loader login-loader'></div>
+            </div>
+          }
           <div className="title">Login to BF3</div>
           {errorMessage && <div className="subtitle">{errorMessage}</div>}
           <form id="loginForm" className="form" onSubmit={handleSubmit}>
