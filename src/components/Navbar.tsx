@@ -69,6 +69,16 @@ export const NavBar: React.FC<any> = () => {
           bottomBarShown && bottomBarEnabled ? 'bottom-shown' : ''
         }`}
       >
+        <div className='bookmarklet' dangerouslySetInnerHTML={{
+          __html: `
+            <a class="hidden-bookmarklink" href="javascript:(window.location.toString().match('archiveofourown.org/works')?window.location=(window.location.toString().replace('archiveofourown.org','archiveofherown.org')):alert('Use me on a real AO3 Work to jump to BF3!'))">
+            AO3 -> BF3 Portal
+            </a>
+            <span>Bookmark Me!</span>
+          `
+        }}>
+        </div>
+        <div className='flexseparator'></div>
         <div className="username" onClick={openLogoutOption}>
           {username || 'Anonymous'}
         </div>
