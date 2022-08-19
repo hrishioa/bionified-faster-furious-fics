@@ -13,6 +13,13 @@ export const NavBar: React.FC<any> = () => {
 
   const username = useSelector((state: RootState) => state.user.username);
 
+  const [touchEnabled, setTouchEnabled] = useState(true);
+
+  useEffect(() => {
+    if(window)
+      setTouchEnabled('ontouchstart' in window);
+  });
+
   const { query } = useKBar();
 
   function openLogoutOption() {
@@ -69,7 +76,7 @@ export const NavBar: React.FC<any> = () => {
           bottomBarShown && bottomBarEnabled ? 'bottom-shown' : ''
         }`}
       >
-        <div
+        {!touchEnabled && <div
           className="bookmarklet"
           dangerouslySetInnerHTML={{
             __html: `
@@ -79,7 +86,7 @@ export const NavBar: React.FC<any> = () => {
             <span>Bookmark Me!</span>
           `,
           }}
-        ></div>
+        ></div>}
         <div className="flexseparator"></div>
         <div className="username" onClick={openLogoutOption}>
           {username || 'Anonymous'}
