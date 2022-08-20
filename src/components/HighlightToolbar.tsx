@@ -45,7 +45,9 @@ export const HighlightToolbar = () => {
 
   useEffect(() => {
     const getContainer = (highlight: Highlight | null) => {
-      if (!highlight) return null;
+      if (!highlight){
+        return null;
+      }
 
       const firstElement = document.querySelector(`.${highlight.startTag}`);
       const lastElement = document.querySelector(`.${highlight.endTag}`);
@@ -72,6 +74,9 @@ export const HighlightToolbar = () => {
     const toolbarContainer = getContainer(currentSelection);
 
     setContainer(toolbarContainer);
+
+    console.log('Container is ',toolbarContainer);
+
   }, [currentSelection]);
 
   return (container && ReactDOM.createPortal(<Toolbar />, container)) || null;

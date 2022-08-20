@@ -67,6 +67,8 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
   return (
     <div
       className={`chapter_container chapter_container_${chapter.meta.count}`}
+      onMouseUp={handleMouseTouchEnd}
+      onTouchEnd={handleMouseTouchEnd}
     >
       <div
         ref={titleDivRef}
@@ -80,8 +82,6 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
       </div>
       <div
         className={`chapter_text chapter-${chapter.meta.id}`}
-        onMouseUp={handleMouseTouchEnd}
-        onTouchEnd={handleMouseTouchEnd}
         dangerouslySetInnerHTML={{
           __html: (showingChapterContent && safeChapterContent) || '',
         }}
