@@ -1,20 +1,10 @@
 import Image from 'next/image';
 import React, { Ref, useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { bioHTML } from 'utils/bionify';
-import { getToolbarPosition } from 'utils/selection';
-import { AO3Chapter, ToolbarPosition } from 'utils/types';
+import { AO3Chapter } from 'utils/types';
+import { highlightChanged } from './Redux-Store/HighlightSlice';
+import { useAppStoreDispatch } from './Redux-Store/hooks';
 import { setCurrentChapter } from './Redux-Store/WorksSlice';
-
-type SelectionToolbarProps = {
-  positionStyle: ToolbarPosition;
-};
-
-const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
-  positionStyle,
-}) => {
-  return <div className="selection-container" style={positionStyle}></div>;
-};
 
 type ChapterProps = {
   chapter: AO3Chapter;
@@ -22,7 +12,7 @@ type ChapterProps = {
 };
 
 const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppStoreDispatch();
 
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
   const [showingChapterContent, showChapterContent] = useState(false);
@@ -30,10 +20,6 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
     prefix: String(chapter.meta.count),
     startId: chapter.meta.id,
   });
-  const [selectionToolbarConfig, setSelectionToolbarConfig] = useState({
-    positionStyle: { display: 'none' },
-  } as SelectionToolbarProps);
-  const [selectedTags, setSelectedTags] = useState([] as string[]);
 
   useEffect(() => {
     if (jumpToThisChapter) {
@@ -53,61 +39,29 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jumpToThisChapter]);
 
-  useEffect(() => {
-    function highlightSelectedTags(tags: string[]) {
-      document
-        .querySelectorAll('.text-selected')
-        ?.forEach((elem) => elem.classList.remove('text-selected'));
-
-      tags.forEach((tag) => {
-        document
-          .querySelector(`.chapter-${chapter.meta.id}`)
-          ?.querySelectorAll(`:scope .${tag}`)
-          ?.forEach((elem) => elem.classList.add('text-selected'));
-      });
-    }
-
-    highlightSelectedTags(selectedTags);
-  }, [selectedTags, chapter.meta.id]);
-
-  function getSelectedTags(selectionHTML: string) {
-    return selectionHTML.match(/tp-[\d]+-[\d]+/g);
-  }
-
-  function highlightSelection(selectionHTML: string) {
-    setSelectedTags(getSelectedTags(selectionHTML) || []);
-    if (!selectionHTML.length)
-      setSelectionToolbarConfig({ positionStyle: { display: 'none' } });
-  }
-
   function handleMouseTouchEnd() {
     const selection = window.getSelection();
 
-    if (!selection) {
-      setSelectionToolbarConfig({ positionStyle: { display: 'none' } });
-      return highlightSelection('');
+    let selectedHTML = '';
+
+    if (selection) {
+      const selectionContainer = document.createElement('div');
+
+      if (selection.rangeCount)
+        for (let i = 0; i < selection.rangeCount; i++)
+          selectionContainer.appendChild(
+            selection.getRangeAt(i).cloneContents(),
+          );
+
+      selectedHTML = selectionContainer.innerHTML;
     }
 
-    const selectionContainer = document.createElement('div');
-
-    if (selection.rangeCount)
-      for (let i = 0; i < selection.rangeCount; i++)
-        selectionContainer.appendChild(selection.getRangeAt(i).cloneContents());
-
-    highlightSelection(selectionContainer.innerHTML);
-
-    const toolbarConfig = getToolbarPosition(selection, window, document);
-
-    if (!toolbarConfig) {
-      setSelectionToolbarConfig({ positionStyle: { display: 'none' } });
-    } else {
-      console.log('Showing toolbar');
-      setSelectionToolbarConfig({
-        positionStyle: toolbarConfig,
-      });
-    }
-
-    window.getSelection()?.removeAllRanges();
+    dispatch(
+      highlightChanged({
+        selectedHTML: selectedHTML,
+        chapterId: chapter.meta.id,
+      }),
+    );
   }
 
   return (
@@ -153,10 +107,6 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
         </div>
       )) ||
         null}
-
-      {selectionToolbarConfig ? (
-        <SelectionToolbar {...selectionToolbarConfig} />
-      ) : null}
     </div>
   );
 };

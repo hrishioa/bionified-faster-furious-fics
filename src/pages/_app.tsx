@@ -9,6 +9,7 @@ import Script from 'next/script';
 import Head from 'next/head';
 import { CommandBar } from '@/components/CommandBar/CommandBar';
 import { ReduxStore } from '@/components/Redux-Store/ReduxStore';
+import { HighlightToolbar } from '@/components/HighlightToolbar';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -33,6 +34,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <CommandBar>
           <Component {...pageProps} />
         </CommandBar>
+        <HighlightToolbar />
       </ReduxStore>
     </>
   );

@@ -1,4 +1,47 @@
-import { ToolbarPosition } from './types';
+import { Highlight, ToolbarPosition } from './types';
+
+export function clarifyAndGetSelection(
+  highlightedHTML: string,
+  chapterId: number,
+): Highlight | null {
+  const tagsMatched = highlightedHTML.match(/tp-[\d]+-[\d]+/g);
+  const tags = (tagsMatched && (tagsMatched as string[])) || [];
+
+  const context = document.querySelector(`.chapter-${chapterId}`);
+  let nodeElements: Element[] = [];
+  const chapterTags: string[] = tags.filter((tag) => {
+    const elements = context?.querySelectorAll(`:scope .${tag}`);
+    const elemArray = elements && Array.from(elements);
+    if (elemArray) nodeElements = nodeElements.concat(elemArray);
+    if (!elemArray || !elemArray.length) return false;
+    else return true;
+  });
+
+  document
+  .querySelectorAll('.text-selected')
+  ?.forEach((elem) => elem.classList.remove('text-selected'));
+
+  window.getSelection()?.removeAllRanges();
+
+  // TODO: Possibly move this to a separate function
+  // to make reasoning about side-effects easier
+  if (nodeElements.length) {
+    const newRange = document.createRange();
+    newRange.setStart(nodeElements[0] as Node, 0);
+    newRange.setEnd(nodeElements[nodeElements.length - 1] as Node, 0);
+    window.getSelection()?.addRange(newRange);
+
+    nodeElements.forEach(element => element.classList.add('text-selected'));
+  }
+
+  return chapterTags.length
+    ? {
+        chapterId,
+        startTag: chapterTags[0],
+        endTag: chapterTags[chapterTags.length - 1],
+      }
+    : null;
+}
 
 const getSelectionRect = (selection: Selection) => {
   try {

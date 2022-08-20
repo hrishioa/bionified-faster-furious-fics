@@ -154,7 +154,7 @@ a {
   span {
     font-family: IBM Plex Serif, serif;
     font-weight: 500;
-    color: black;
+    color: var(--text-color);
     position: absolute;
     left: 0;
     pointer-events: none;
@@ -167,8 +167,75 @@ a {
   }
 
   .hidden-bookmarklink {
-    color: white !important;
+    color: var(--body-bg-color) !important;
     text-decoration-color: white;
+  }
+}
+
+.highlight-toolbar-container {
+  position:relative;
+
+  .highlight-toolbar {
+    background: var(--cb-transparent-background);
+    border-radius: 10px;
+    box-shadow: 0 4px 30px rgb(0 0 0 / 10%);
+    backdrop-filter: blur(9.5px);
+    // box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    // box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    // box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
+    color: var(--cb-foreground);
+    padding:0;
+    position:absolute;
+    top: 39px;
+    display:flex;
+  }
+
+  .highlight-toolbar-icon-container {
+    height: 100%;
+    position: relative;
+    color: var(--cb-foreground);
+
+    &:before {
+      content: attr(data-tooltip); /* here's the magic */
+      position:absolute;
+      top:100%;
+      left:0;
+      font-size: 0.75em;
+      padding:5px 15px;
+      border-radius:5px;
+      width:100px;
+      background-color: var(--cb-foreground);
+      color: var(--cb-background);
+      text-align:center;
+      font-weight:600;
+      display:none; /* hide by default */
+    }
+
+    &:hover:before{
+      display:block;
+    }
+
+    &:hover{
+      background-color: var(--cb-foreground);
+      color: var(--cb-background);
+    }
+
+    &:first-child {
+      border-radius: 10px 0 0 10px;
+    }
+    &:last-child {
+      border-radius: 0 10px 10px 0;
+    }
+
+    &:active {
+      transform: translate(1px, 1px);
+    }
+  }
+
+  .highlight-toolbar-icon {
+    margin: 0.4em 0.4em 0.1em;
+    font-size: 25px;
   }
 }
 

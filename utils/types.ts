@@ -17,6 +17,11 @@ export const ALLOWED_COOKIES = [
   'remember_user_token',
 ];
 
+export type Highlight = {
+  chapterId: number;
+  startTag: string;
+  endTag: string;
+};
 
 export type FicLoadError = {
   failed: true;

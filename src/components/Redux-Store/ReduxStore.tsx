@@ -2,6 +2,7 @@ import React from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 import workReducer from './WorksSlice';
 import userReducer from './UserSlice';
+import highlightReducer from './HighlightSlice';
 import { Provider } from 'react-redux';
 
 export type ReduxStoreProps = {
@@ -12,6 +13,7 @@ export const appStore = configureStore({
   reducer: {
     work: workReducer,
     user: userReducer,
+    highlight: highlightReducer,
   },
 });
 
