@@ -18,7 +18,7 @@ export const NavBar: React.FC<any> = () => {
   useEffect(() => {
     if(window)
       setTouchEnabled('ontouchstart' in window);
-  });
+  }, []);
 
   const { query } = useKBar();
 
