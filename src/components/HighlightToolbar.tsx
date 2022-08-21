@@ -6,20 +6,30 @@ import { AiTwotoneHighlight } from 'react-icons/ai';
 import { MdEditNote } from 'react-icons/md';
 import { FiShare2 } from 'react-icons/fi';
 import { MdContentCopy } from 'react-icons/md';
-import { saveHighlight } from './Redux-Store/HighlightSlice';
+import { deleteHighlight, saveHighlight } from './Redux-Store/HighlightSlice';
 
 const Toolbar = () => {
   const dispatch = useAppStoreDispatch();
-  const [highlighted, setHighlighted] = useState(false);
   const currentSelection = useAppStoreSelector(
     (state) => state.highlight.currentSelection,
   );
+  const highlighted = useAppStoreSelector((state) =>
+    state.highlight.currentSelection &&
+    !!state.highlight.highlights.find(highlight => highlight.chapterId === state.highlight.currentSelection?.chapterId && highlight.endTag === state.highlight.currentSelection.endTag && highlight.startTag === state.highlight.currentSelection.startTag) || false
+  );
+  // const [highlighted, setHighlighted] = useState(false);
+
 
   function highlight() {
-    if(currentSelection && !highlighted) {
-      setHighlighted(true);
-      dispatch(saveHighlight(currentSelection));
-      console.log('Highlighted');
+    if(currentSelection) {
+      if(!highlighted) {
+        // setHighlighted(true);
+        dispatch(saveHighlight(currentSelection));
+        console.log('Highlighted');
+      } else {
+        // setHighlighted(false);
+        dispatch(deleteHighlight(currentSelection));
+      }
     }
   }
 

@@ -25,10 +25,12 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
   const highlights = useAppStoreSelector((state) => state.highlight.highlights);
 
   useEffect(() => {
-    if(showingChapterContent)
+    if(showingChapterContent) {
+      console.log('Updating highlights to ',highlights);
       window.setTimeout(() => {
         updateChapterSavedHighlights(chapter.meta.id, highlights);
       },0);
+    }
   }, [showingChapterContent, highlights, chapter.meta.id]);
 
   useEffect(() => {

@@ -62,6 +62,11 @@
 .text-highlighted {
   background-color: var(--highlight-saved-background);
   color: var(--text-color) !important;
+  cursor: pointer;
+}
+
+.text-highlighted-hovered {
+  filter: invert(1);
 }
 
 .chapter_text {

@@ -1,8 +1,35 @@
+import { selectSavedHighlight } from '@/components/Redux-Store/HighlightSlice';
+import { appStore } from '@/components/Redux-Store/ReduxStore';
+import { debounce } from 'lodash';
 import { Highlight, ToolbarPosition } from './types';
+
+export function makeDocumentSelection(chapterId: number, startTagId: number, endTagId: number) {
+  console.log('Making doc selection... for chapter ',chapterId);
+  const context = document.querySelector(`.chapter-${chapterId}`);
+
+  if(!context)
+    return;
+
+  console.log('Finding tags ',{startTagId, endTagId});
+
+  const startTag = context.querySelector(`:scope .tp-${startTagId}`);
+  const endTag = context.querySelector(`:scope .tp-${endTagId}`);
+
+  if(!startTag || !endTag)
+    return;
+
+  window.getSelection()?.removeAllRanges();
+
+  const newRange = document.createRange();
+  newRange.setStart(startTag as Node, 0);
+  newRange.setEnd(endTag as Node, 0);
+  window.getSelection()?.addRange(newRange);
+}
 
 export function clarifyAndGetSelection(
   highlightedHTML: string,
   chapterId: number,
+  highlightId: number,
 ): Highlight | null {
   const tagsMatched = highlightedHTML.match(/tp-[\d]+[\d]+/g);
   const tags = (tagsMatched && (tagsMatched as string[])) || [];
@@ -35,36 +62,30 @@ export function clarifyAndGetSelection(
     .querySelectorAll('.text-selected')
     ?.forEach((elem) => elem.classList.remove('text-selected'));
 
-  window.getSelection()?.removeAllRanges();
-
-  // TODO: This can be significantly cleaned up, this whole function using just tag1 and tag2.
-  const onlyTextElements = chapterElements.filter(
-    (elem) => elem.innerHTML !== '' && elem.innerHTML.search(/\S/g) !== -1,
-  );
-
   // TODO: Possibly move this to a separate function
   // to make reasoning about side-effects easier
-  if (onlyTextElements.length) {
-    const newRange = document.createRange();
-    newRange.setStart(onlyTextElements[0] as Node, 0);
-    newRange.setEnd(onlyTextElements[onlyTextElements.length - 1] as Node, 0);
-    window.getSelection()?.addRange(newRange);
-
-    onlyTextElements.forEach((element) =>
+  if (chapterElements.length) {
+    chapterElements.forEach((element) =>
       element.classList.add('text-selected'),
     );
   }
 
-  if(tag1 && tag2) {
+  window.getSelection()?.removeAllRanges();
+
+  if (tag1 && tag2) {
     const tagNumber1 = getTagNumberFromClasses(tag1);
     const tagNumber2 = getTagNumberFromClasses(tag2);
 
-    if(tagNumber1 && tagNumber2)
+    if (tagNumber1 && tagNumber2) {
+      makeDocumentSelection(chapterId, tagNumber1, tagNumber2);
+
       return {
         chapterId,
         startTag: Math.min(tagNumber1, tagNumber2),
         endTag: Math.max(tagNumber1, tagNumber2),
-      }
+        id: highlightId,
+      };
+    }
   }
 
   return null;
@@ -87,8 +108,7 @@ export function updateChapterSavedHighlights(
   }
 
   const chapterContext = document.querySelector(`.chapter-${chapterId}`);
-  if(!chapterContext)
-    return;
+  if (!chapterContext) return;
 
   const chapterHighlights = highlights.filter(
     (highlight) => highlight.chapterId === chapterId,
@@ -106,20 +126,70 @@ export function updateChapterSavedHighlights(
     tagNumber: number;
   }[];
 
+  chapterContext.querySelectorAll(':scope .bio-tag').forEach(c => c.removeEventListener('mouseenter', highlightMouseEnter));
+
+  chapterTags.forEach(tag => {
+    tag.element.removeEventListener('mouseenter', highlightMouseEnter);
+    tag.element.removeEventListener('mouseleave', highlightMouseLeave);
+    tag.element.classList.remove('text-highlighted');
+    tag.element.classList.remove('text-highlighted-hovered');
+    const highlightTagMatch = tag.element.className.match(/highlight-[\d]+/);
+    if(highlightTagMatch && highlightTagMatch.length)
+      tag.element.classList.remove(highlightTagMatch[1]);
+  });
+
   chapterHighlights.forEach((highlight) => {
     const highlightedTags = chapterTags.filter((tag) => {
       return tagInHighlight(tag.tagNumber, highlight);
     });
 
-    highlightedTags.forEach(tag => tag.element.classList.add('text-highlighted'));
+    highlightedTags.forEach((tag) => {
+      tag.element.classList.add('text-highlighted');
+      tag.element.classList.add(`highlight-${highlight.id}`);
+      tag.element.addEventListener('mouseenter', highlightMouseEnter);
+      tag.element.addEventListener('mouseleave', highlightMouseLeave);
+      tag.element.addEventListener('click', highlightClick);
+    });
   });
 }
+
+function highlightClick(event: any) {
+  console.log('clicked - ',event);
+  if(event && event.srcElement && event.srcElement.className) {
+    const highlightMatch = event.srcElement.className.toString().match(/highlight-([\d])+/);
+    if(highlightMatch && highlightMatch.length >= 2 && !isNaN(parseInt(highlightMatch[1]))) {
+      const highlightId = parseInt(highlightMatch[1]);
+      console.log('Showing toolbar for ',highlightId);
+      appStore.dispatch(selectSavedHighlight(highlightId))
+    }
+  };
+}
+
+function highlightMouseEnter(event: any) {
+  highlightMouseLeave.cancel();
+  if(event && event.toElement && event.toElement.className && event.toElement.classList.contains('text-highlighted')) {
+    const highlightTagMatch = event.toElement.className.toString().match(/highlight-[\d]+/);
+    if(highlightTagMatch && highlightTagMatch.length) {
+      console.log('highlighting ',highlightTagMatch[0])
+      document.querySelectorAll(`.${highlightTagMatch[0]}`).forEach(elem => elem.classList.add('text-highlighted-hovered'));
+    }
+  }
+}
+
+const highlightMouseLeave = debounce((event: any) => {
+  if(event && event.fromElement && event.fromElement.className) {
+    const highlightTagMatch = event.fromElement.className.toString().match(/highlight-[\d]+/);
+    if(highlightTagMatch && highlightTagMatch.length) {
+      console.log('highlighting ',highlightTagMatch[0])
+      document.querySelectorAll(`.${highlightTagMatch[0]}`).forEach(elem => elem.classList.remove('text-highlighted-hovered'));
+    }
+  }
+}, 100);
 
 export function updateGlobalSavedHighlights(highlights: Highlight[]) {
   Array.from(
     new Set(highlights.map((highlight) => highlight.chapterId)),
-  )
-    .forEach((chapterId) => (updateChapterSavedHighlights(chapterId, highlights)));
+  ).forEach((chapterId) => updateChapterSavedHighlights(chapterId, highlights));
 }
 
 const getSelectionRect = (selection: Selection) => {

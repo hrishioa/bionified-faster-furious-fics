@@ -21,6 +21,7 @@ export const ALLOWED_COOKIES = [
 ];
 
 export type Highlight = {
+  id: number;
   chapterId: number;
   startTag: number;
   endTag: number;
