@@ -74,9 +74,6 @@ export const HighlightToolbar = () => {
     const toolbarContainer = getContainer(currentSelection);
 
     setContainer(toolbarContainer);
-
-    console.log('Container is ',toolbarContainer);
-
   }, [currentSelection]);
 
   return (container && ReactDOM.createPortal(<Toolbar />, container)) || null;

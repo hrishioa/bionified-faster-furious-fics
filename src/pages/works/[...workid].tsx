@@ -2,6 +2,7 @@ import { MemoizedChapter } from '@/components/Chapter';
 import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChaptersInMenu';
 import { RootState } from '@/components/Redux-Store/ReduxStore';
 import {
+  jumpToChapter,
   setChapterMeta,
   setCurrentChapter,
   setScroll,
@@ -27,7 +28,7 @@ const WorkPage = (props: {
 }) => {
   const { work, cookies, selectedChapter } = props;
   const dispatch = useDispatch();
-  const jumpToChapter = useSelector(
+  const jumpedChapter = useSelector(
     (state: RootState) => state.work.jumpToChapter,
   );
 
@@ -69,6 +70,11 @@ const WorkPage = (props: {
   }, [work, dispatch]);
 
   useEffect(() => {
+    if(selectedChapter)
+      dispatch(jumpToChapter(selectedChapter));
+  }, [selectedChapter]);
+
+  useEffect(() => {
     dispatch(
       setCurrentChapter(selectedChapter || work?.chapters[0].meta.id || 0),
     );
@@ -103,7 +109,7 @@ const WorkPage = (props: {
         {work?.chapters.map((chapter) => (
           <MemoizedChapter
             jumpToThisChapter={
-              (jumpToChapter && jumpToChapter === chapter.meta.id) || false
+              (jumpedChapter && jumpedChapter === chapter.meta.id) || false
             }
             chapter={chapter}
             key={chapter.meta.id}
