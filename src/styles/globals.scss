@@ -13,6 +13,7 @@
   --cb-overlay-color: rgba(150, 150, 150, 0.159);
   --cb-transparent-background: rgba(255, 255, 255, 0.285);
   --cb-placeholder-color: rgb(125, 125, 125);
+  --highlight-saved-background: hsl(180deg 100% 70%);
   --highlight-background: rgb(3, 107, 107);
   --highlight-text-color: white;
   --link-unvisited-color: hsl(231deg 100% 60%);
@@ -33,6 +34,7 @@
   --cb-overlay-color: rgba(0, 0, 0, 0.5);
   --cb-transparent-background: rgba(84, 84, 84, 0.45);
   --cb-placeholder-color: rgb(153, 153, 153);
+  --highlight-saved-background: rgb(22 99 50);
   --highlight-background: rgb(3, 189, 189);
   --highlight-text-color: black;
   --link-unvisited-color: hsl(231deg 100% 71%);
@@ -53,6 +55,7 @@
   --cb-overlay-color: rgba(0, 0, 0, 0.5);
   --cb-transparent-background: rgba(84, 84, 84, 0.45);
   --cb-placeholder-color: rgb(153, 153, 153);
+  --highlight-saved-background: hsl(39deg 80% 21%);
   --highlight-background: orange;
   --highlight-text-color: black;
   --link-unvisited-color: hsl(231deg 100% 71%);
@@ -193,6 +196,10 @@ a {
     position:absolute;
     top: 39px;
     display:flex;
+  }
+
+  .highlight-toolbar-icon-used {
+    color: var(--link-unvisited-color) !important;
   }
 
   .highlight-toolbar-icon-container {

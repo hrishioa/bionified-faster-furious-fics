@@ -1,40 +1,56 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Highlight } from 'utils/types';
-import { useAppStoreSelector } from './Redux-Store/hooks';
+import { useAppStoreDispatch, useAppStoreSelector } from './Redux-Store/hooks';
 import { AiTwotoneHighlight } from 'react-icons/ai';
 import { MdEditNote } from 'react-icons/md';
 import { FiShare2 } from 'react-icons/fi';
 import { MdContentCopy } from 'react-icons/md';
+import { saveHighlight } from './Redux-Store/HighlightSlice';
 
 const Toolbar = () => {
-  return (
-    <span className="highlight-toolbar-container">
-      <div className="highlight-toolbar">
-        <span
-          className="highlight-toolbar-icon-container"
-          data-tooltip="Highlight"
-        >
-          <AiTwotoneHighlight className="highlight-toolbar-icon" />
-        </span>
-        <span
-          className="highlight-toolbar-icon-container"
-          data-tooltip="Add Note"
-        >
-          <MdEditNote className="highlight-toolbar-icon" />
-        </span>
-        <span className="highlight-toolbar-icon-container" data-tooltip="Share">
-          <FiShare2 className="highlight-toolbar-icon" />
-        </span>
-        <span
-          className="highlight-toolbar-icon-container"
-          data-tooltip="Copy Text"
-        >
-          <MdContentCopy className="highlight-toolbar-icon" />
-        </span>
-      </div>
-    </span>
+  const dispatch = useAppStoreDispatch();
+  const [highlighted, setHighlighted] = useState(false);
+  const currentSelection = useAppStoreSelector(
+    (state) => state.highlight.currentSelection,
   );
+
+  function highlight() {
+    if(currentSelection && !highlighted) {
+      setHighlighted(true);
+      dispatch(saveHighlight(currentSelection));
+      console.log('Highlighted');
+    }
+  }
+
+  return currentSelection ?
+      (<span className="highlight-toolbar-container">
+        <div className="highlight-toolbar">
+          <span
+            className={`highlight-toolbar-icon-container ${highlighted ? 'highlight-toolbar-icon-used' : ''}`}
+            data-tooltip="Highlight"
+            onClick={highlight}
+          >
+            <AiTwotoneHighlight className="highlight-toolbar-icon" />
+          </span>
+          <span
+            className="highlight-toolbar-icon-container"
+            data-tooltip="Add Note"
+          >
+            <MdEditNote className="highlight-toolbar-icon" />
+          </span>
+          <span className="highlight-toolbar-icon-container" data-tooltip="Share">
+            <FiShare2 className="highlight-toolbar-icon" />
+          </span>
+          <span
+            className="highlight-toolbar-icon-container"
+            data-tooltip="Copy Text"
+          >
+            <MdContentCopy className="highlight-toolbar-icon" />
+          </span>
+        </div>
+      </span>)
+     : (<></>);
 };
 
 export const HighlightToolbar = () => {
@@ -49,8 +65,8 @@ export const HighlightToolbar = () => {
         return null;
       }
 
-      const firstElement = document.querySelector(`.${highlight.startTag}`);
-      const lastElement = document.querySelector(`.${highlight.endTag}`);
+      const firstElement = document.querySelector(`.tp-${highlight.startTag}`);
+      const lastElement = document.querySelector(`.tp-${highlight.endTag}`);
       (window as any).sel = { firstElement, lastElement };
 
       if (!firstElement || !lastElement) {

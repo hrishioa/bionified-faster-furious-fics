@@ -1,4 +1,3 @@
-const defaultRestSheet = 'opacity: 0.9;';
 const defaultAlgoParameters = '- 0 1 1 2 0.4';
 
 type AlgoParameters = {
@@ -74,16 +73,16 @@ export function bioText(text: string, idConfig: IdConfig, algoParameters: AlgoPa
   }
 
   function bioRest(text: string) {
-    return `<span class="bio-rest tp-${idConfig.prefix}-${idConfig.startId++}">${text}</span>`
+    return `<span class="bio-tag bio-rest tp-${idConfig.prefix}${idConfig.startId++}">${text}</span>`
   }
 
   function bioEmphasize(text: string) {
-    return `<span class="bio-emphasize tp-${idConfig.prefix}-${idConfig.startId++}">${text}</span>`
+    return `<span class="bio-tag bio-emphasize tp-${idConfig.prefix}${idConfig.startId++}">${text}</span>`
   }
 
   let res = '';
   for (const word of text.split(' ')) {
-    res += bioWord(word, algoParameters) + ' ';
+    res += bioWord(word+' ', algoParameters);
   }
   return res;
 }

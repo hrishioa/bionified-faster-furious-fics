@@ -59,6 +59,11 @@
   color: var(--highlight-text-color) !important;
 }
 
+.text-highlighted {
+  background-color: var(--highlight-saved-background);
+  color: var(--text-color) !important;
+}
+
 .chapter_text {
   max-width: 65vw;
   margin: 0 auto;

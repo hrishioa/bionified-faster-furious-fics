@@ -22,8 +22,8 @@ export const ALLOWED_COOKIES = [
 
 export type Highlight = {
   chapterId: number;
-  startTag: string;
-  endTag: string;
+  startTag: number;
+  endTag: number;
 };
 
 export type FicLoadError = {

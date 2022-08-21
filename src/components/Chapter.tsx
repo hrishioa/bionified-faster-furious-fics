@@ -1,10 +1,11 @@
 import Image from 'next/image';
 import React, { Ref, useEffect, useRef, useState } from 'react';
 import { bioHTML } from 'utils/bionify';
+import { updateChapterSavedHighlights } from 'utils/highlight';
 import { AO3Chapter } from 'utils/types';
 import { Meta } from './Meta';
 import { highlightChanged } from './Redux-Store/HighlightSlice';
-import { useAppStoreDispatch } from './Redux-Store/hooks';
+import { useAppStoreDispatch, useAppStoreSelector } from './Redux-Store/hooks';
 import { setCurrentChapter } from './Redux-Store/WorksSlice';
 
 type ChapterProps = {
@@ -21,6 +22,14 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
     prefix: String(chapter.meta.count),
     startId: chapter.meta.id,
   });
+  const highlights = useAppStoreSelector((state) => state.highlight.highlights);
+
+  useEffect(() => {
+    if(showingChapterContent)
+      window.setTimeout(() => {
+        updateChapterSavedHighlights(chapter.meta.id, highlights);
+      },0);
+  }, [showingChapterContent, highlights, chapter.meta.id]);
 
   useEffect(() => {
     if (jumpToThisChapter) {
