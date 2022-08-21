@@ -45,7 +45,7 @@ export const HighlightToolbar = () => {
 
   useEffect(() => {
     const getContainer = (highlight: Highlight | null) => {
-      if (!highlight){
+      if (!highlight) {
         return null;
       }
 

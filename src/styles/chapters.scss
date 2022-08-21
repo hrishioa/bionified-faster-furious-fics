@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;1,100;1,200;1,300;1,400;1,500&display=block');
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap');
+
+.chapter_meta_data {
+  max-width: 65vw;
+  margin: 3rem auto 0;
+}
+
+.work_meta_data {
+  max-width: 70vw;
+  margin: 2rem auto 4rem;
+}
+
+.meta_data {
+  font-family: IBM Plex Serif;
+  font-size: 17px;
+  line-height: 1.5;
+
+  hr {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, var(--body-bg-color), var(--text-color), var(--body-bg-color));
+    width: 50%;
+    margin: 2rem auto;
+  }
+
+  .meta_data_content {
+    overflow: hidden;
+  }
+
+  .meta_data_content_hidden {
+    max-height: 50px;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+  }
+
+  .meta_data_title {
+    cursor: pointer;
+    font-family: Cinzel Decorative;
+    font-size: 20px;
+    opacity: 0.65;
+    font-weight: 600;
+  }
+}
+
+.chapter_title {
+  max-width: 65vw;
+  margin: 30px auto;
+  font-size: 1.7rem;
+  font-weight: 400;
+  line-height: 1.7;
+  /* font-family: 'IBM Plex Serif' */
+  font-family: Cinzel Decorative;
+  cursor: pointer;
+}
+
+.text-selected {
+  background-color: var(--highlight-background);
+  color: var(--highlight-text-color) !important;
+}
+
+.chapter_text {
+  max-width: 65vw;
+  margin: 0 auto;
+  font-size: 20px;
+  line-height: 1.7;
+  font-family: 'IBM Plex Serif'
+}
+
+.chapter_text::selection,.bio-emphasize::selection,.bio-rest::selection {
+  background: var(--highlight-background);
+  color: var(--highlight-text-color) !important;
+}
+
+.landmark.heading {
+  opacity:0;
+  height: 0;
+}
+
+.bio-emphasize {
+  /* font-weight: 600; */
+  /* font-size: 1.00em; */
+}
+
+.bio-rest {
+  color: var(--rest-color);
+}
+
+@media(max-width: 900px) {
+  .chapter_meta_data {
+    max-width: 80vw;
+    margin: 3rem auto -2rem;
+  }
+
+  .chapter_text {
+    max-width: 80vw;
+  }
+
+  .chapter_title {
+    max-width: 80vw;
+  }
+
+  .work_meta_data {
+    max-width: 90vw;
+    margin: 1rem auto 2rem;
+  }
+
+  .meta_data {
+    font-family: IBM Plex Serif;
+    font-size: 15px;
+    line-height: 1.5;
+
+    hr {
+      border: 0;
+      height: 1px;
+      background-image: linear-gradient(to right, var(--body-bg-color), var(--text-color), var(--body-bg-color));
+      width: 80%;
+      margin: 2rem auto;
+    }
+  }
+}
+
+@media(max-width: 500px) {
+  .chapter_metadata {
+    max-width: 90vw;
+    margin: 3rem auto -3rem;
+  }
+
+  .chapter_text {
+    max-width: 90vw;
+    font-size: 18px;
+  }
+
+  .chapter_title {
+    max-width: 90vw;
+    font-size: 1.3rem;
+  }
+}

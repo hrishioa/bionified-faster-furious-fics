@@ -9,6 +9,9 @@ export type WorkInfo = {
   subscribeId: number | null;
   workMeta: WorkMeta;
   workStats: WorkStats;
+  summaryHTML: string;
+  startNotesHTML: string;
+  endNotesHTML: string;
 };
 
 export const ALLOWED_COOKIES = [

@@ -244,6 +244,10 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
 
   const { meta: workMeta, stats: workStats } = extractMeta(workDOM);
 
+  const summaryDiv = workDOM('div#workskin > div.preface > div.summary > .userstuff');
+  const startNotesDiv = workDOM('div#workskin > div.preface > div.notes > .userstuff');
+  const endNotesDiv = workDOM('div#work_endnotes > .userstuff');
+
   let subscribeId: number | null = null;
 
   const subscribeLink = workDOM('ul.work.navigation.actions')
@@ -272,6 +276,9 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
       authenticityToken,
       workMeta,
       workStats,
+      summaryHTML: summaryDiv.html() || '',
+      startNotesHTML: startNotesDiv.html() || '',
+      endNotesHTML: endNotesDiv.html() || ''
     },
     chapters,
     metaDlHTML: metaDl.html() || '',
@@ -343,17 +350,19 @@ function cleanString(text: string): string {
 }
 
 function loadChapter(chapterDiv: cheerio.Cheerio<cheerio.Element>): AO3Chapter {
-  let prefaceDiv = chapterDiv.find('div.preface.module.group');
-  if (!prefaceDiv.length) prefaceDiv = chapterDiv.find('div.preface.group');
-  let summaryDiv = chapterDiv.find('div#summary');
-  if (!summaryDiv.length) summaryDiv = chapterDiv.find('div.summary.module');
-  let startNotesDiv = chapterDiv.find('div#notes');
-  if (!startNotesDiv.length) startNotesDiv = chapterDiv.find('div.notes');
+  let prefaceDiv = chapterDiv.find('div.preface.module.group > .userstuff');
+  if (!prefaceDiv.length) prefaceDiv = chapterDiv.find('div.preface.group > .userstuff');
+  let summaryDiv = chapterDiv.find('div#summary > .userstuff');
+  if (!summaryDiv.length) {
+    summaryDiv = chapterDiv.find('div.summary.module > .userstuff');
+  }
+  let startNotesDiv = chapterDiv.find('div#notes > .userstuff');
+  if (!startNotesDiv.length) startNotesDiv = chapterDiv.find('div.notes > .userstuff');
 
   const count = parseInt((chapterDiv.attr('id') as string).split('-')[1]);
 
   const endNotesDiv =
-    (!isNaN(count) && chapterDiv.find(`div#chapter_${count}_endnotes`)) || null;
+    (!isNaN(count) && chapterDiv.find(`div#chapter_${count}_endnotes > .userstuff`)) || null;
   let titleH3 = chapterDiv.find('h3.title');
   if (!titleH3.length) titleH3 = chapterDiv.find('h2.title');
   const textDiv = chapterDiv.find('div[role=article]');

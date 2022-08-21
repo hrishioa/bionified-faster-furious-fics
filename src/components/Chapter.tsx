@@ -2,6 +2,7 @@ import Image from 'next/image';
 import React, { Ref, useEffect, useRef, useState } from 'react';
 import { bioHTML } from 'utils/bionify';
 import { AO3Chapter } from 'utils/types';
+import { Meta } from './Meta';
 import { highlightChanged } from './Redux-Store/HighlightSlice';
 import { useAppStoreDispatch } from './Redux-Store/hooks';
 import { setCurrentChapter } from './Redux-Store/WorksSlice';
@@ -80,12 +81,23 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
       >
         {chapter.meta.title}
       </div>
+      {showingChapterContent && (
+        <div className='chapter_meta_data'>
+          <Meta contentHTML={chapter.summaryDivHTML} title='Summary' />
+          <Meta contentHTML={chapter.startNotesDivHTML} title='Notes' />
+        </div>
+      )}
       <div
         className={`chapter_text chapter-${chapter.meta.id}`}
         dangerouslySetInnerHTML={{
           __html: (showingChapterContent && safeChapterContent) || '',
         }}
       />
+      {showingChapterContent && (
+        <div className='chapter_meta_data'>
+          <Meta contentHTML={chapter.endNotesDivHTML} title='EndNotes' />
+        </div>
+      )}
       {(showingChapterContent && (
         <div
           style={{

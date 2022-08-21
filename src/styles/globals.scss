@@ -78,6 +78,10 @@ body {
   height: 80px;
 }
 
+.work {
+  margin-top: 3rem;
+}
+
 .navbar .username {
   cursor: pointer;
   padding: 20px;
@@ -239,3 +243,8 @@ a {
   }
 }
 
+@media(max-width: 900px) {
+  .bookmarklet {
+    display:none;
+  }
+}
