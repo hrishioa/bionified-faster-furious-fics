@@ -34,6 +34,27 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
   }, [showingChapterContent, highlights, chapter.meta.id]);
 
   useEffect(() => {
+    if(showingChapterContent) {
+      const footNoteLinks = document.querySelector(`.chapter-${chapter.meta.id}`)?.querySelectorAll(':scope a');
+
+      footNoteLinks?.forEach(link => {
+        if(!link || !('href' in link))
+          return;
+        const linkSplit = (link as any).href?.split('#');
+        if(!linkSplit || !linkSplit.length)
+          return;
+        const linkId = linkSplit[linkSplit.length-1];
+
+        const linkElement = document.querySelector(`a[name=${linkId}]`) as HTMLLinkElement | null;
+
+        const linkContent = linkElement?.parentElement?.textContent;
+
+        ((link as HTMLLinkElement).dataset as any).tooltip = linkContent ? linkContent.substring(0,500)+(linkContent.length > 500 ? '...':'') : 'Click to go to footnote';
+      })
+    }
+  }, [showingChapterContent]);
+
+  useEffect(() => {
     if (jumpToThisChapter) {
       let waitToScrollMs = 0;
       if (!showingChapterContent) {

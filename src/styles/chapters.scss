@@ -74,7 +74,38 @@
   margin: 0 auto;
   font-size: 20px;
   line-height: 1.7;
-  font-family: 'IBM Plex Serif'
+  font-family: 'IBM Plex Serif', serif;
+
+  img {
+    width: 100%;
+    object-fit: scale-down;
+  }
+
+  a {
+    position:relative;
+
+    &:before {
+      content: attr(data-tooltip); /* here's the magic */
+      position:absolute;
+      top:100%;
+      left:0;
+
+      font-size: 0.75em;
+      padding:10px 15px;
+      border-radius:5px;
+      width:250px;
+      background-color: var(--cb-foreground);
+      color: var(--cb-background);
+      text-align:center;
+      font-weight:400;
+      line-height: 1.3;
+      display:none;
+    }
+
+    &:hover:before{
+      display:block;
+    }
+  }
 }
 
 .chapter_text::selection,.bio-emphasize::selection,.bio-rest::selection {

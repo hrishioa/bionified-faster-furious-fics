@@ -132,6 +132,7 @@ export async function loadWork(
 
   const runTag = getTimeTag();
 
+  console.log(`${runTag} - Loading fic ${workId}`);
   console.time(`${runTag} - Loading fic ${workId}`);
   const {
     data: workData,
