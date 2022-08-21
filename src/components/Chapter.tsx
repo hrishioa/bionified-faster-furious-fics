@@ -25,32 +25,37 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
   const highlights = useAppStoreSelector((state) => state.highlight.highlights);
 
   useEffect(() => {
-    if(showingChapterContent) {
-      console.log('Updating highlights to ',highlights);
+    if (showingChapterContent) {
+      console.log('Updating highlights to ', highlights);
       window.setTimeout(() => {
         updateChapterSavedHighlights(chapter.meta.id, highlights);
-      },0);
+      }, 0);
     }
   }, [showingChapterContent, highlights, chapter.meta.id]);
 
   useEffect(() => {
-    if(showingChapterContent) {
-      const footNoteLinks = document.querySelector(`.chapter-${chapter.meta.id}`)?.querySelectorAll(':scope a');
+    if (showingChapterContent) {
+      const footNoteLinks = document
+        .querySelector(`.chapter-${chapter.meta.id}`)
+        ?.querySelectorAll(':scope a');
 
-      footNoteLinks?.forEach(link => {
-        if(!link || !('href' in link))
-          return;
+      footNoteLinks?.forEach((link) => {
+        if (!link || !('href' in link)) return;
         const linkSplit = (link as any).href?.split('#');
-        if(!linkSplit || !linkSplit.length)
-          return;
-        const linkId = linkSplit[linkSplit.length-1];
+        if (!linkSplit || !linkSplit.length) return;
+        const linkId = linkSplit[linkSplit.length - 1];
 
-        const linkElement = document.querySelector(`a[name=${linkId}]`) as HTMLLinkElement | null;
+        const linkElement = document.querySelector(
+          `a[name=${linkId}]`,
+        ) as HTMLLinkElement | null;
 
         const linkContent = linkElement?.parentElement?.textContent;
 
-        ((link as HTMLLinkElement).dataset as any).tooltip = linkContent ? linkContent.substring(0,500)+(linkContent.length > 500 ? '...':'') : 'Click to go to footnote';
-      })
+        ((link as HTMLLinkElement).dataset as any).tooltip = linkContent
+          ? linkContent.substring(0, 500) +
+            (linkContent.length > 500 ? '...' : '')
+          : 'Click to go to footnote';
+      });
     }
   }, [showingChapterContent]);
 
@@ -114,9 +119,9 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
         {chapter.meta.title}
       </div>
       {showingChapterContent && (
-        <div className='chapter_meta_data'>
-          <Meta contentHTML={chapter.summaryDivHTML} title='Summary' />
-          <Meta contentHTML={chapter.startNotesDivHTML} title='Notes' />
+        <div className="chapter_meta_data">
+          <Meta contentHTML={chapter.summaryDivHTML} title="Summary" />
+          <Meta contentHTML={chapter.startNotesDivHTML} title="Notes" />
         </div>
       )}
       <div
@@ -126,8 +131,8 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
         }}
       />
       {showingChapterContent && (
-        <div className='chapter_meta_data'>
-          <Meta contentHTML={chapter.endNotesDivHTML} title='EndNotes' />
+        <div className="chapter_meta_data">
+          <Meta contentHTML={chapter.endNotesDivHTML} title="EndNotes" />
         </div>
       )}
       {(showingChapterContent && (

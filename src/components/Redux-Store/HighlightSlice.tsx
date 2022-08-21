@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { clarifyAndGetSelection, makeDocumentSelection, updateGlobalSavedHighlights } from 'utils/highlight';
+import {
+  clarifyAndGetSelection,
+  makeDocumentSelection,
+  updateGlobalSavedHighlights,
+} from 'utils/highlight';
 import { Highlight } from 'utils/types';
 
 export type HighlightState = {
@@ -9,7 +13,7 @@ export type HighlightState = {
 
 const initialHighlightState: HighlightState = {
   currentSelection: null,
-  highlights: []
+  highlights: [],
 };
 
 const highlightSlice = createSlice({
@@ -23,18 +27,22 @@ const highlightSlice = createSlice({
       const highlight = clarifyAndGetSelection(
         action.payload.selectedHTML,
         action.payload.chapterId,
-        state.highlights.length
+        state.highlights.length,
       );
 
       state.currentSelection = highlight;
     },
     selectSavedHighlight: (state, action: PayloadAction<number>) => {
-      if(action.payload > 0 && action.payload < state.highlights.length) {
+      if (action.payload > 0 && action.payload < state.highlights.length) {
         const selectedHighlight = state.highlights[action.payload];
-        console.log('Showing ',selectedHighlight);
+        console.log('Showing ', selectedHighlight);
         state.currentSelection = selectedHighlight;
 
-        makeDocumentSelection(selectedHighlight.chapterId, selectedHighlight.startTag, selectedHighlight.endTag)
+        makeDocumentSelection(
+          selectedHighlight.chapterId,
+          selectedHighlight.startTag,
+          selectedHighlight.endTag,
+        );
       }
     },
     saveHighlight: (state, action: PayloadAction<Highlight>) => {
@@ -42,10 +50,19 @@ const highlightSlice = createSlice({
       updateGlobalSavedHighlights(state.highlights);
     },
     deleteHighlight: (state, action: PayloadAction<Highlight>) => {
-      state.highlights = state.highlights.filter(highlight => highlight.startTag !== action.payload.startTag || highlight.endTag !== action.payload.endTag)
-    }
+      state.highlights = state.highlights.filter(
+        (highlight) =>
+          highlight.startTag !== action.payload.startTag ||
+          highlight.endTag !== action.payload.endTag,
+      );
+    },
   },
 });
 
-export const { highlightChanged, saveHighlight, deleteHighlight, selectSavedHighlight } = highlightSlice.actions;
+export const {
+  highlightChanged,
+  saveHighlight,
+  deleteHighlight,
+  selectSavedHighlight,
+} = highlightSlice.actions;
 export default highlightSlice.reducer;

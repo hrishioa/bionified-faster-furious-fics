@@ -105,10 +105,10 @@ const WorkPage = (props: {
       <Head>
         <title>{work?.meta.title + ' - BF3' || 'FuriousFics'}</title>
       </Head>
-      <div className='work'>
-        <div className='work_meta_data'>
-          <Meta contentHTML={work.meta.summaryHTML} title='Summary' />
-          <Meta contentHTML={work.meta.startNotesHTML} title='Notes' />
+      <div className="work">
+        <div className="work_meta_data">
+          <Meta contentHTML={work.meta.summaryHTML} title="Summary" />
+          <Meta contentHTML={work.meta.startNotesHTML} title="Notes" />
         </div>
         <div>
           {work?.chapters.map((chapter) => (
@@ -122,8 +122,8 @@ const WorkPage = (props: {
           ))}
         </div>
         <hr />
-        <div className='work_meta_data'>
-          <Meta contentHTML={work.meta.endNotesHTML} title='End Notes' />
+        <div className="work_meta_data">
+          <Meta contentHTML={work.meta.endNotesHTML} title="End Notes" />
         </div>
       </div>
     </>
