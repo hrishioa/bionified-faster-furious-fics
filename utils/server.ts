@@ -1,7 +1,7 @@
 import { Highlight } from './types';
 
 const LOCAL_SERVER_URL = 'http://localhost:4000';
-const SERVER_URL = 'http://134.209.65.38:4000';
+const SERVER_URL = 'https://api.archiveofherown.org';
 
 export async function serverGetHighlights(workId: number) {
   const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL || LOCAL_SERVER_URL}/highlight/getAllForWork`;
@@ -41,7 +41,7 @@ export async function serverDeleteHighlight(highlight: Highlight, username: stri
 async function serverEditHighlight(highlight: Highlight, username: string, workId: number, opType: 'delete' | 'upsert') {
   console.log('Saving highlight ',highlight, ' for user ',username,' and work ',workId);
 
-  const url = `${process.env.REACT_APP_SERVER_URL || LOCAL_SERVER_URL}/highlight/upsert`;
+  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL || LOCAL_SERVER_URL}/highlight/upsert`;
   const body = {
     creator: username,
     workId: workId,
