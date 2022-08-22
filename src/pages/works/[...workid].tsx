@@ -72,9 +72,20 @@ const WorkPage = (props: {
   useFocusActions();
 
   useEffect(() => {
+    let intervalRefresh: NodeJS.Timer | null;
+
     if (work.meta) {
       dispatch(fetchServerHighlights({ workId: work.meta.id }));
+
+      intervalRefresh = setInterval(() => {
+        console.log('Fetching highlights...');
+        dispatch(fetchServerHighlights({ workId: work.meta.id }));
+      }, 120000);
     }
+
+    return () => {
+      if (intervalRefresh) clearInterval(intervalRefresh);
+    };
   }, [dispatch, work.meta]);
 
   useEffect(() => {
