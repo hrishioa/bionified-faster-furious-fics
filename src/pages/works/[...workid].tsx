@@ -74,7 +74,7 @@ const WorkPage = (props: {
 
   useEffect(() => {
     if (selectedChapter) dispatch(jumpToChapter(selectedChapter));
-  }, [selectedChapter]);
+  }, [selectedChapter, dispatch]);
 
   useEffect(() => {
     dispatch(

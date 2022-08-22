@@ -4,16 +4,16 @@ import {
   makeDocumentSelection,
   updateGlobalSavedHighlights,
 } from 'utils/highlight';
-import { Highlight } from 'utils/types';
+import { Highlight, SavedHighlights } from 'utils/types';
 
 export type HighlightState = {
   currentSelection: Highlight | null;
-  highlights: Highlight[];
+  highlights: SavedHighlights;
 };
 
 const initialHighlightState: HighlightState = {
   currentSelection: null,
-  highlights: [],
+  highlights: {},
 };
 
 const highlightSlice = createSlice({
@@ -27,15 +27,15 @@ const highlightSlice = createSlice({
       const highlight = clarifyAndGetSelection(
         action.payload.selectedHTML,
         action.payload.chapterId,
-        state.highlights.length,
+        Object.keys(state.highlights).length,
       );
 
       state.currentSelection = highlight;
     },
     selectSavedHighlight: (state, action: PayloadAction<number>) => {
-      if (action.payload > 0 && action.payload < state.highlights.length) {
-        const selectedHighlight = state.highlights[action.payload];
-        console.log('Showing ', selectedHighlight);
+      const selectedHighlight = state.highlights[action.payload];
+
+      if (selectedHighlight) {
         state.currentSelection = selectedHighlight;
 
         makeDocumentSelection(
@@ -46,15 +46,22 @@ const highlightSlice = createSlice({
       }
     },
     saveHighlight: (state, action: PayloadAction<Highlight>) => {
-      state.highlights.push(action.payload);
+      state.highlights[action.payload.id] = action.payload;
       updateGlobalSavedHighlights(state.highlights);
     },
     deleteHighlight: (state, action: PayloadAction<Highlight>) => {
-      state.highlights = state.highlights.filter(
-        (highlight) =>
+      Object.keys(state.highlights).forEach((highlightId) => {
+        const highlight = state.highlights[parseInt(highlightId)];
+
+        if (
           highlight.startTag !== action.payload.startTag ||
-          highlight.endTag !== action.payload.endTag,
-      );
+          highlight.endTag !== action.payload.endTag ||
+          highlight.chapterId !== action.payload.chapterId
+        )
+          return;
+
+        delete state.highlights[parseInt(highlightId)];
+      });
     },
   },
 });

@@ -12,9 +12,7 @@ import {
 } from 'kbar';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Redux-Store/ReduxStore';
-import { BadCat, Collapse, DarkModeIcon, Focus, Logout } from '../Icons';
-import { useAppStoreDispatch, useAppStoreSelector } from '../Redux-Store/hooks';
-import { setAllMeta, setFocusMode } from '../Redux-Store/WorksSlice';
+import { BadCat, DarkModeIcon, Logout } from '../Icons';
 
 type ComplexResultItemProps = {
   action: ActionImpl;
@@ -100,19 +98,17 @@ const RenderResults = () => {
 export const CommandBarLogic = () => {
   // TODO: Question: How can we do this better?
   const { curChapterName, curScrollPercent } = useSelector(
-    (state: RootState) => ({
-      curChapterName:
-        (state.work.chapterInfo &&
-          state.work.chapterInfo.find(
-            (chapter) => chapter.id === state.work.currentChapterId,
-          )?.title) ||
-        null,
-      curScrollPercent: state.work.chapterScrollPercentage,
-    }),
+    (state: RootState) => {
+      const currentChapter =
+        state.work.chapterInfo[state.work.currentChapterId];
+
+      return {
+        curChapterName: (currentChapter && currentChapter.title) || null,
+        curScrollPercent: state.work.chapterScrollPercentage,
+      };
+    },
   );
   const MAX_CHAPTER_NAME_LENGTH = 35;
-
-  // useDetectFontSize();
 
   return (
     <KBarPortal>
@@ -143,9 +139,6 @@ export const CommandBar = ({
 }: {
   children?: JSX.Element | JSX.Element[];
 }) => {
-  const dispatch = useAppStoreDispatch();
-  const focusMode = useAppStoreSelector(state => state.work.focusMode);
-
   const actions = [
     //TODO: Re-enable when font size is implemented
     // {

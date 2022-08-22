@@ -182,7 +182,56 @@ a {
 .highlight-toolbar-container {
   position:relative;
 
-  .highlight-toolbar {
+  .highlight-notes-window {
+    top: 6rem;
+    padding: 10px;
+    font-size: 0.8em;
+    line-height: 1.5;
+    width: 30vw;
+    font-weight: 600;
+
+    .highlight-notes-content {
+      max-height: 25vh;
+      overflow: auto;
+    }
+
+    textarea {
+      width:100%;
+      font-family: IBM Plex Serif;
+      border: none;
+      border-radius: 5px;
+      padding: 0.5em;
+    }
+
+    .submit-button {
+      height: 100%;
+      position: absolute;
+      padding-right: 0.25rem;
+      right:0;
+      top:0;
+      color: var(--cb-foreground);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 0 10px 10px 0;
+
+      &:active {
+        transform: translate(1px, 1px);
+      }
+
+      &:hover{
+        background-color: green;
+        color: white;
+      }
+    }
+  }
+
+  .highlight-buttons-window {
+    top: 39px;
+    padding:0;
+  }
+
+  .highlight-toolbar-window {
     background: var(--cb-transparent-background);
     border-radius: 10px;
     box-shadow: 0 4px 30px rgb(0 0 0 / 10%);
@@ -192,14 +241,23 @@ a {
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
     // box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
     color: var(--cb-foreground);
-    padding:0;
     position:absolute;
-    top: 39px;
     display:flex;
   }
 
   .highlight-toolbar-icon-used {
     color: var(--link-unvisited-color) !important;
+  }
+
+  .highlight-icon-double-container {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.5em;
+
+    .highlight-toolbar-icon-container {
+      padding: 0 1em;
+      width: 100%;
+    }
   }
 
   .highlight-toolbar-icon-container {
@@ -246,12 +304,27 @@ a {
 
   .highlight-toolbar-icon {
     margin: 0.4em 0.4em 0.1em;
-    font-size: 25px;
+    // font-size: 25px;
+    font-size: 1.25em;
   }
 }
 
 @media(max-width: 900px) {
   .bookmarklet {
     display:none;
+  }
+
+  .highlight-toolbar-container{
+    .highlight-notes-window {
+      width: 60vw;
+    }
+  }
+}
+
+@media(max-width: 500px) {
+  .highlight-toolbar-container{
+    .highlight-notes-window {
+      width: 80vw;
+    }
   }
 }

@@ -56,12 +56,12 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
             ? linkContent.substring(0, 500) +
               (linkContent.length > 500 ? '...' : '')
             : 'Click to go to footnote';
-        } catch(err) {
-          console.error('error adjusting link text - ',err);
+        } catch (err) {
+          console.error('error adjusting link text - ', err);
         }
       });
     }
-  }, [showingChapterContent]);
+  }, [showingChapterContent, chapter.meta.id]);
 
   useEffect(() => {
     if (jumpToThisChapter) {

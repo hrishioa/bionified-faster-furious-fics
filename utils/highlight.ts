@@ -1,7 +1,7 @@
 import { selectSavedHighlight } from '@/components/Redux-Store/HighlightSlice';
 import { appStore } from '@/components/Redux-Store/ReduxStore';
 import { debounce } from 'lodash';
-import { Highlight, ToolbarPosition } from './types';
+import { Highlight, SavedHighlights, ToolbarPosition } from './types';
 
 export function makeDocumentSelection(chapterId: number, startTagId: number, endTagId: number) {
   console.log('Making doc selection... for chapter ',chapterId);
@@ -84,6 +84,7 @@ export function clarifyAndGetSelection(
         startTag: Math.min(tagNumber1, tagNumber2),
         endTag: Math.max(tagNumber1, tagNumber2),
         id: highlightId,
+        note: ''
       };
     }
   }
@@ -100,17 +101,19 @@ function getTagNumberFromClasses(classes: string) {
 
 export function updateChapterSavedHighlights(
   chapterId: number,
-  highlights: Highlight[],
+  highlights: SavedHighlights,
 ) {
   function tagInHighlight(tag: number, highlight: Highlight) {
     if (tag <= highlight.endTag && tag >= highlight.startTag) return true;
     return false;
   }
 
+  const highlightArray = Object.keys(highlights).map(highlightId => highlights[parseInt(highlightId)]);
+
   const chapterContext = document.querySelector(`.chapter-${chapterId}`);
   if (!chapterContext) return;
 
-  const chapterHighlights = highlights.filter(
+  const chapterHighlights = highlightArray.filter(
     (highlight) => highlight.chapterId === chapterId,
   );
 
@@ -129,9 +132,10 @@ export function updateChapterSavedHighlights(
   chapterContext.querySelectorAll(':scope .bio-tag').forEach(c => c.removeEventListener('mouseenter', highlightMouseEnter));
 
   chapterTags.forEach(tag => {
-    tag.element.removeEventListener('mouseenter', highlightMouseEnter);
-    tag.element.removeEventListener('mouseleave', highlightMouseLeave);
+    // tag.element.removeEventListener('mouseenter', highlightMouseEnter);
+    // tag.element.removeEventListener('mouseleave', highlightMouseLeave);
     tag.element.classList.remove('text-highlighted');
+    tag.element.classList.remove('has-note');
     tag.element.classList.remove('text-highlighted-hovered');
     const highlightTagMatch = tag.element.className.match(/highlight-[\d]+/);
     if(highlightTagMatch && highlightTagMatch.length)
@@ -143,18 +147,20 @@ export function updateChapterSavedHighlights(
       return tagInHighlight(tag.tagNumber, highlight);
     });
 
+    if(highlightedTags.length && highlight.note.length)
+      highlightedTags[0].element.classList.add('has-note');
+
     highlightedTags.forEach((tag) => {
       tag.element.classList.add('text-highlighted');
       tag.element.classList.add(`highlight-${highlight.id}`);
-      tag.element.addEventListener('mouseenter', highlightMouseEnter);
-      tag.element.addEventListener('mouseleave', highlightMouseLeave);
+      // tag.element.addEventListener('mouseenter', highlightMouseEnter);
+      // tag.element.addEventListener('mouseleave', highlightMouseLeave);
       tag.element.addEventListener('click', highlightClick);
     });
   });
 }
 
 function highlightClick(event: any) {
-  console.log('clicked - ',event);
   if(event && event.srcElement && event.srcElement.className) {
     const highlightMatch = event.srcElement.className.toString().match(/highlight-([\d])+/);
     if(highlightMatch && highlightMatch.length >= 2 && !isNaN(parseInt(highlightMatch[1]))) {
@@ -186,9 +192,9 @@ const highlightMouseLeave = debounce((event: any) => {
   }
 }, 100);
 
-export function updateGlobalSavedHighlights(highlights: Highlight[]) {
+export function updateGlobalSavedHighlights(highlights: SavedHighlights) {
   Array.from(
-    new Set(highlights.map((highlight) => highlight.chapterId)),
+    new Set(Object.keys(highlights).map((highlightId) => highlights[parseInt(highlightId)].chapterId)),
   ).forEach((chapterId) => updateChapterSavedHighlights(chapterId, highlights));
 }
 

@@ -20,11 +20,14 @@ export const ALLOWED_COOKIES = [
   'remember_user_token',
 ];
 
+export type SavedHighlights = {[key: number]: Highlight};
+
 export type Highlight = {
   id: number;
   chapterId: number;
   startTag: number;
   endTag: number;
+  note: string;
 };
 
 export type FicLoadError = {

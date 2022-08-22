@@ -3,9 +3,11 @@ import { ChapterMeta, WorkInfo } from 'utils/types';
 
 export type MetaDisplayState = 'collapsed' | 'expanded' | null;
 
+export type ChapterInfoDict = { [key: number]: ChapterMeta };
+
 export type WorkState = {
   workInfo: WorkInfo | null;
-  chapterInfo: ChapterMeta[];
+  chapterInfo: ChapterInfoDict;
   currentChapterId: number;
   chapterScrollPercentage: number;
   jumpToChapter: null | number;
@@ -13,10 +15,10 @@ export type WorkState = {
 
 const initialWorkState: WorkState = {
   workInfo: null,
-  chapterInfo: [],
+  chapterInfo: {},
   currentChapterId: 0,
   chapterScrollPercentage: 0,
-  jumpToChapter: null
+  jumpToChapter: null,
 };
 
 const workSlice = createSlice({
@@ -24,7 +26,10 @@ const workSlice = createSlice({
   initialState: initialWorkState,
   reducers: {
     setChapterMeta: (state, action: PayloadAction<ChapterMeta[]>) => {
-      state.chapterInfo = action.payload;
+      state.chapterInfo = action.payload.reduce((acc, cur) => {
+        acc[cur.id] = cur;
+        return acc;
+      }, {} as ChapterInfoDict);
     },
     setSubscribeStatus: (state, action: PayloadAction<number | null>) => {
       if (state.workInfo) state.workInfo.subscribeId = action.payload;
