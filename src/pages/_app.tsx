@@ -10,6 +10,7 @@ import Head from 'next/head';
 import { CommandBar } from '@/components/CommandBar/CommandBar';
 import { ReduxStore } from '@/components/Redux-Store/ReduxStore';
 import { HighlightToolbar } from '@/components/HighlightToolbar';
+import { Toaster } from 'react-hot-toast';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -30,6 +31,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>FuriousFics</title>
       </Head>
+      <Toaster position="top-left" reverseOrder={true} />
       <ReduxStore>
         <CommandBar>
           <Component {...pageProps} />

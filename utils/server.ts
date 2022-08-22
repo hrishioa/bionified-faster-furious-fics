@@ -44,6 +44,7 @@ async function serverEditHighlight(highlight: Highlight, username: string, workI
   const body = {
     creator: username,
     workId: workId,
+    highlightId: highlight.id,
     chapterId: highlight.chapterId,
     startTag: highlight.startTag,
     endTag: highlight.endTag,

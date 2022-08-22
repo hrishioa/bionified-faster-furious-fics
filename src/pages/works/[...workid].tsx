@@ -11,7 +11,7 @@ import {
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { getWorkId, loadWork } from 'utils/fics';
 import { getChapterScrollPosition } from 'utils/scroll';
 import { ALLOWED_COOKIES, AO3Work } from 'utils/types';
@@ -22,20 +22,46 @@ import { NavBar } from '@/components/Navbar';
 import useSubscribeActions from '@/components/CommandBar/SubMenus/useSubscribeActions';
 import useFocusActions from '@/components/CommandBar/SubMenus/useFocusActions';
 import { Meta } from '@/components/Meta';
-import { serverGetHighlights } from 'utils/server';
-import { fetchServerHighlights } from '@/components/Redux-Store/HighlightSlice';
-import { useAppStoreDispatch } from '@/components/Redux-Store/hooks';
+import {
+  fetchServerHighlights,
+  highlightJumpFinished,
+  requestJumpToHighlight,
+  selectSavedHighlight,
+} from '@/components/Redux-Store/HighlightSlice';
+import {
+  useAppStoreDispatch,
+  useAppStoreSelector,
+} from '@/components/Redux-Store/hooks';
 
 const WorkPage = (props: {
   work: AO3Work;
   cookies: string[] | null;
   selectedChapter: number | null;
+  selectedHighlightId: number | null;
 }) => {
-  const { work, cookies, selectedChapter } = props;
+  const { work, cookies, selectedChapter, selectedHighlightId } = props;
   const dispatch = useAppStoreDispatch();
   const jumpedChapter = useSelector(
     (state: RootState) => state.work.jumpToChapter,
   );
+
+  const availableJumpToHighlight = useAppStoreSelector(
+    (state) => state.highlight.jumpToHighlight?.availableHighlight,
+  );
+
+  useEffect(() => {
+    if (availableJumpToHighlight) {
+      dispatch(jumpToChapter(availableJumpToHighlight.chapterId));
+      dispatch(selectSavedHighlight(availableJumpToHighlight.id));
+      dispatch(highlightJumpFinished());
+    }
+  }, [availableJumpToHighlight]);
+
+  useEffect(() => {
+    if (selectedHighlightId) {
+      dispatch(requestJumpToHighlight(selectedHighlightId));
+    }
+  }, [selectedHighlightId]);
 
   useEffect(() => {
     dispatch(setWorkInfo(work.meta));
@@ -46,13 +72,10 @@ const WorkPage = (props: {
   useFocusActions();
 
   useEffect(() => {
-    if(work.meta) {
-      // serverGetHighlights(work.meta.id);
-      const h = dispatch(fetchServerHighlights({workId: work.meta.id}));
-      console.log('Got h ',h);
-      console.log('Got h unpacked ',h.unwrap());
+    if (work.meta) {
+      dispatch(fetchServerHighlights({ workId: work.meta.id }));
     }
-  }, [dispatch, work.meta])
+  }, [dispatch, work.meta]);
 
   useEffect(() => {
     const saveScrollPosition = debounce(() => {
@@ -144,6 +167,19 @@ const WorkPage = (props: {
   );
 };
 
+function getHighlightIdFromQuery(query: ParsedUrlQuery) {
+  if (Array.isArray(query.workid)) {
+    const cIndex = query.workid.findIndex((token) => token === 'highlight');
+    if (
+      cIndex !== -1 &&
+      query.workid.length >= cIndex + 2 &&
+      !isNaN(parseInt((query.workid as string[])[cIndex + 1]))
+    )
+      return parseInt((query.workid as string[])[cIndex + 1]);
+  }
+  return null;
+}
+
 function getChapterFromQuery(query: ParsedUrlQuery) {
   if (Array.isArray(query.workid)) {
     const cIndex = query.workid.findIndex((token) => token === 'chapters');
@@ -165,6 +201,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   }, [] as string[]);
 
   const selectedChapter = getChapterFromQuery(ctx.query);
+  const selectedHighlightId = getHighlightIdFromQuery(ctx.query);
 
   if (ctx.query.workid) {
     const workId = getWorkId(
@@ -210,6 +247,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         work: workData?.work || null,
         cookies: workData?.cookies || null,
         selectedChapter,
+        selectedHighlightId,
       },
     };
   } else {

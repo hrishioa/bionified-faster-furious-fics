@@ -5,8 +5,8 @@ import { useAppStoreDispatch, useAppStoreSelector } from './Redux-Store/hooks';
 import { AiTwotoneHighlight } from 'react-icons/ai';
 import { MdEditNote } from 'react-icons/md';
 import { FiShare2 } from 'react-icons/fi';
-import { MdContentCopy } from 'react-icons/md';
 import { TiTickOutline } from 'react-icons/ti';
+import toast from 'react-hot-toast';
 import {
   deleteHighlight,
   saveHighlight,
@@ -14,6 +14,7 @@ import {
 } from './Redux-Store/HighlightSlice';
 import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
 import { serverDeleteHighlight, serverSaveHighlight } from 'utils/server';
+import { copyTextToClipboard } from 'utils/misc';
 
 const Toolbar = () => {
   const dispatch = useAppStoreDispatch();
@@ -22,20 +23,24 @@ const Toolbar = () => {
   );
   const [note, setNote] = useState(currentSelection?.note || '');
   const [editNoteActive, setEditNoteActive] = useState(false);
+  const noteTextAreaRef = useRef(null as null | HTMLTextAreaElement);
   const toolbarContainerRef = useRef(null as null | HTMLSpanElement);
-  const username = useAppStoreSelector(state => state.work.workInfo?.username);
-  const workId = useAppStoreSelector(state => state.work.workInfo?.id);
+  const username = useAppStoreSelector(
+    (state) => state.work.workInfo?.username,
+  );
+  const workId = useAppStoreSelector((state) => state.work.workInfo?.id);
+
+  useEffect(() => {
+    if (noteTextAreaRef.current) noteTextAreaRef.current.focus();
+  }, [editNoteActive]);
 
   useEffect(() => {
     if (toolbarContainerRef.current) {
       const rect = toolbarContainerRef.current.getBoundingClientRect();
-      // if(rect.bottom > window.innerHeight || rect.bottom < 0) {
-      // toolbarContainerRef.current.scrollIntoView({behavior: 'smooth'});
       window.scrollTo({
         top: rect.top + window.scrollY - window.innerHeight * 0.5,
         behavior: 'smooth',
       });
-      // }
     }
   }, [currentSelection]);
 
@@ -94,13 +99,17 @@ const Toolbar = () => {
 
   function updateNote() {
     if (currentSelection) {
-      if(username && workId)
-        serverSaveHighlight({
-          ...currentSelection,
-          ...{
-            note,
+      if (username && workId)
+        serverSaveHighlight(
+          {
+            ...currentSelection,
+            ...{
+              note,
+            },
           },
-        }, username, workId);
+          username,
+          workId,
+        );
 
       dispatch(
         saveHighlight({
@@ -117,11 +126,11 @@ const Toolbar = () => {
   function highlight() {
     if (currentSelection) {
       if (highlightInfo.highlightId === null) {
-        if(username && workId)
+        if (username && workId)
           serverSaveHighlight(currentSelection, username, workId);
         dispatch(saveHighlight(currentSelection));
       } else {
-        if(username && workId)
+        if (username && workId)
           serverDeleteHighlight(currentSelection, username, workId);
         dispatch(deleteHighlight(currentSelection));
       }
@@ -149,15 +158,32 @@ const Toolbar = () => {
         >
           <MdEditNote className="highlight-toolbar-icon" />
         </span>
-        <span className="highlight-toolbar-icon-container" data-tooltip="Share">
-          <FiShare2 className="highlight-toolbar-icon" />
-        </span>
-        <span
+        {(highlightInfo.highlightId !== null && (
+          <span
+            className="highlight-toolbar-icon-container"
+            data-tooltip="Share"
+            onClick={() => {
+              if (currentSelection) {
+                copyTextToClipboard(
+                  `${window.location.href.split('/highlight/')[0]}/highlight/${
+                    currentSelection.id
+                  }`,
+                );
+                toast('Copied this highlight to clipboard!');
+              }
+            }}
+          >
+            <FiShare2 className="highlight-toolbar-icon" />
+          </span>
+        )) ||
+          null}
+
+        {/* <span
           className="highlight-toolbar-icon-container"
           data-tooltip="Copy Text"
         >
           <MdContentCopy className="highlight-toolbar-icon" />
-        </span>
+        </span> */}
         {(highlightInfo.previousId !== undefined && (
           <span
             className="highlight-toolbar-icon-container"
@@ -205,6 +231,7 @@ const Toolbar = () => {
           {(editNoteActive && (
             <textarea
               rows={5}
+              ref={noteTextAreaRef}
               placeholder={'Add a note!'}
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -222,7 +249,9 @@ const Toolbar = () => {
               className="highlight-notes-content"
               onClick={() => setEditNoteActive(true)}
             >
-              {`${currentSelection.creator ? `${currentSelection.creator}: ` : ''}${note}`}
+              {`${
+                currentSelection.creator ? `${currentSelection.creator}: ` : ''
+              }${note}`}
             </div>
           )) ||
             null}

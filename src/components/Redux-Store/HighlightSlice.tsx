@@ -6,21 +6,38 @@ import {
 } from 'utils/highlight';
 import { serverGetHighlights } from 'utils/server';
 import { Highlight, SavedHighlights } from 'utils/types';
+import toast from 'react-hot-toast';
 
 export type HighlightState = {
   currentSelection: Highlight | null;
   highlights: SavedHighlights;
+  jumpToHighlight: {
+    requested: number | null;
+    availableHighlight: Highlight | null;
+  } | null;
 };
 
 const initialHighlightState: HighlightState = {
   currentSelection: null,
   highlights: {},
+  jumpToHighlight: null,
 };
+
+const HIGHLIGHT_HASH_MAX = 1000000000;
 
 const highlightSlice = createSlice({
   name: 'highlight',
   initialState: initialHighlightState,
   reducers: {
+    requestJumpToHighlight: (state, action: PayloadAction<number>) => {
+      state.jumpToHighlight = {
+        requested: action.payload,
+        availableHighlight: state.highlights[action.payload] || null,
+      };
+    },
+    highlightJumpFinished: (state) => {
+      state.jumpToHighlight = null;
+    },
     highlightChanged: (
       state,
       action: PayloadAction<{ selectedHTML: string; chapterId: number }>,
@@ -28,10 +45,24 @@ const highlightSlice = createSlice({
       const highlight = clarifyAndGetSelection(
         action.payload.selectedHTML,
         action.payload.chapterId,
-        Object.keys(state.highlights).length,
+        Math.floor(Math.random() * HIGHLIGHT_HASH_MAX),
       );
 
-      state.currentSelection = highlight;
+      const existingHighlightId = Object.keys(state.highlights).find(
+        (highlightId) => {
+          const existingHighlight = state.highlights[parseInt(highlightId)];
+          return (
+            existingHighlight.chapterId === highlight?.chapterId &&
+            existingHighlight.startTag === highlight?.startTag &&
+            existingHighlight.endTag === highlight?.endTag
+          );
+        },
+      );
+
+      if (existingHighlightId)
+        state.currentSelection =
+          state.highlights[parseInt(existingHighlightId)];
+      else state.currentSelection = highlight;
     },
     selectSavedHighlight: (state, action: PayloadAction<number>) => {
       const selectedHighlight = state.highlights[action.payload];
@@ -67,32 +98,49 @@ const highlightSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchServerHighlights.fulfilled, (state, action) => {
-      console.log('Fetch server highlights is fulfilled with ',state,' and ',action);
-      if(action.payload.length) {
-        action.payload.forEach(highlight => {
-          console.log('Adding ',highlight);
+      let addedHighlights = 0;
+
+      if (action.payload.length) {
+        action.payload.forEach((highlight) => {
+          if (!state.highlights[highlight.id]) addedHighlights++;
           state.highlights[highlight.id] = highlight;
-        })
+        });
+      }
+
+      if (addedHighlights)
+        toast(
+          `Loaded ${addedHighlights} new highlight${
+            addedHighlights > 1 ? 's' : ''
+          }!`,
+        );
+
+      if (
+        state.jumpToHighlight?.requested &&
+        state.highlights[state.jumpToHighlight.requested]
+      ) {
+        state.jumpToHighlight = {
+          requested: state.jumpToHighlight.requested,
+          availableHighlight: state.highlights[state.jumpToHighlight.requested],
+        };
       }
     });
-  }
+  },
 });
 
 export const fetchServerHighlights = createAsyncThunk<
   Highlight[],
   { workId: number }
->(
-  'highlight/fetchServerHighlights',
-  async (argument: { workId: number }) => {
-    const highlights = await serverGetHighlights(argument.workId);
-    return highlights;
-  },
-);
+>('highlight/fetchServerHighlights', async (argument: { workId: number }) => {
+  const highlights = await serverGetHighlights(argument.workId);
+  return highlights;
+});
 
 export const {
   highlightChanged,
   saveHighlight,
   deleteHighlight,
   selectSavedHighlight,
+  requestJumpToHighlight,
+  highlightJumpFinished,
 } = highlightSlice.actions;
 export default highlightSlice.reducer;

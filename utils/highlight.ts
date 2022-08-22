@@ -162,7 +162,8 @@ export function updateChapterSavedHighlights(
 
 function highlightClick(event: any) {
   if(event && event.srcElement && event.srcElement.className) {
-    const highlightMatch = event.srcElement.className.toString().match(/highlight-([\d])+/);
+    const highlightMatch = event.srcElement.className.toString().match(/highlight-([\d]+)/);
+    console.log('highlight match is ',highlightMatch);
     if(highlightMatch && highlightMatch.length >= 2 && !isNaN(parseInt(highlightMatch[1]))) {
       const highlightId = parseInt(highlightMatch[1]);
       console.log('Showing toolbar for ',highlightId);
