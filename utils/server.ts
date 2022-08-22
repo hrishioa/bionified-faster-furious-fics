@@ -1,10 +1,10 @@
 import { Highlight } from './types';
 
-// const LOCAL_SERVER_URL = 'http://localhost:4000';
+const LOCAL_SERVER_URL = 'http://localhost:4000';
 const SERVER_URL = 'http://134.209.65.38:4000';
 
 export async function serverGetHighlights(workId: number) {
-  const url = `${process.env.REACT_APP_SERVER_URL || LOCAL_SERVER_URL}/highlight/getAllForWork`;
+  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL || LOCAL_SERVER_URL}/highlight/getAllForWork`;
   const body = { workId };
 
   try {
