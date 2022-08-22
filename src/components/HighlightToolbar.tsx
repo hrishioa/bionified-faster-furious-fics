@@ -13,6 +13,7 @@ import {
   selectSavedHighlight,
 } from './Redux-Store/HighlightSlice';
 import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
+import { serverDeleteHighlight, serverSaveHighlight } from 'utils/server';
 
 const Toolbar = () => {
   const dispatch = useAppStoreDispatch();
@@ -22,6 +23,8 @@ const Toolbar = () => {
   const [note, setNote] = useState(currentSelection?.note || '');
   const [editNoteActive, setEditNoteActive] = useState(false);
   const toolbarContainerRef = useRef(null as null | HTMLSpanElement);
+  const username = useAppStoreSelector(state => state.work.workInfo?.username);
+  const workId = useAppStoreSelector(state => state.work.workInfo?.id);
 
   useEffect(() => {
     if (toolbarContainerRef.current) {
@@ -90,7 +93,15 @@ const Toolbar = () => {
   });
 
   function updateNote() {
-    if (currentSelection)
+    if (currentSelection) {
+      if(username && workId)
+        serverSaveHighlight({
+          ...currentSelection,
+          ...{
+            note,
+          },
+        }, username, workId);
+
       dispatch(
         saveHighlight({
           ...currentSelection,
@@ -99,14 +110,19 @@ const Toolbar = () => {
           },
         }),
       );
+    }
     setEditNoteActive(false);
   }
 
   function highlight() {
     if (currentSelection) {
       if (highlightInfo.highlightId === null) {
+        if(username && workId)
+          serverSaveHighlight(currentSelection, username, workId);
         dispatch(saveHighlight(currentSelection));
       } else {
+        if(username && workId)
+          serverDeleteHighlight(currentSelection, username, workId);
         dispatch(deleteHighlight(currentSelection));
       }
     }
@@ -206,7 +222,7 @@ const Toolbar = () => {
               className="highlight-notes-content"
               onClick={() => setEditNoteActive(true)}
             >
-              {note}
+              {`${currentSelection.creator ? `${currentSelection.creator}: ` : ''}${note}`}
             </div>
           )) ||
             null}

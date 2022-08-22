@@ -23,6 +23,7 @@ export const ALLOWED_COOKIES = [
 export type SavedHighlights = {[key: number]: Highlight};
 
 export type Highlight = {
+  creator?: string;
   id: number;
   chapterId: number;
   startTag: number;

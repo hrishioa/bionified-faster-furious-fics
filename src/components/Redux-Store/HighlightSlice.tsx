@@ -1,9 +1,10 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   clarifyAndGetSelection,
   makeDocumentSelection,
   updateGlobalSavedHighlights,
 } from 'utils/highlight';
+import { serverGetHighlights } from 'utils/server';
 import { Highlight, SavedHighlights } from 'utils/types';
 
 export type HighlightState = {
@@ -64,7 +65,29 @@ const highlightSlice = createSlice({
       });
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchServerHighlights.fulfilled, (state, action) => {
+      console.log('Fetch server highlights is fulfilled with ',state,' and ',action);
+      if(action.payload.length) {
+        action.payload.forEach(highlight => {
+          console.log('Adding ',highlight);
+          state.highlights[highlight.id] = highlight;
+        })
+      }
+    });
+  }
 });
+
+export const fetchServerHighlights = createAsyncThunk<
+  Highlight[],
+  { workId: number }
+>(
+  'highlight/fetchServerHighlights',
+  async (argument: { workId: number }) => {
+    const highlights = await serverGetHighlights(argument.workId);
+    return highlights;
+  },
+);
 
 export const {
   highlightChanged,

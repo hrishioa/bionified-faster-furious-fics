@@ -22,6 +22,9 @@ import { NavBar } from '@/components/Navbar';
 import useSubscribeActions from '@/components/CommandBar/SubMenus/useSubscribeActions';
 import useFocusActions from '@/components/CommandBar/SubMenus/useFocusActions';
 import { Meta } from '@/components/Meta';
+import { serverGetHighlights } from 'utils/server';
+import { fetchServerHighlights } from '@/components/Redux-Store/HighlightSlice';
+import { useAppStoreDispatch } from '@/components/Redux-Store/hooks';
 
 const WorkPage = (props: {
   work: AO3Work;
@@ -29,7 +32,7 @@ const WorkPage = (props: {
   selectedChapter: number | null;
 }) => {
   const { work, cookies, selectedChapter } = props;
-  const dispatch = useDispatch();
+  const dispatch = useAppStoreDispatch();
   const jumpedChapter = useSelector(
     (state: RootState) => state.work.jumpToChapter,
   );
@@ -41,6 +44,15 @@ const WorkPage = (props: {
 
   useSubscribeActions();
   useFocusActions();
+
+  useEffect(() => {
+    if(work.meta) {
+      // serverGetHighlights(work.meta.id);
+      const h = dispatch(fetchServerHighlights({workId: work.meta.id}));
+      console.log('Got h ',h);
+      console.log('Got h unpacked ',h.unwrap());
+    }
+  }, [dispatch, work.meta])
 
   useEffect(() => {
     const saveScrollPosition = debounce(() => {
