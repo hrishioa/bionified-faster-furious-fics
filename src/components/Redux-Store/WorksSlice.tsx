@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ChapterMeta, WorkInfo } from 'utils/types';
 
+export type MetaDisplayState = 'collapsed' | 'expanded' | null;
+
 export type WorkState = {
   workInfo: WorkInfo | null;
   chapterInfo: ChapterMeta[];
@@ -14,7 +16,7 @@ const initialWorkState: WorkState = {
   chapterInfo: [],
   currentChapterId: 0,
   chapterScrollPercentage: 0,
-  jumpToChapter: null,
+  jumpToChapter: null
 };
 
 const workSlice = createSlice({

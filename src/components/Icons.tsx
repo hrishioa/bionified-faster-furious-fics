@@ -77,3 +77,25 @@ export const Unsubscribe = () => {
     </Suspense>
   );
 };
+
+const CollapseBase = dynamic<any>(() => import('./Icons/Collapse'), {
+  suspense: true,
+});
+export const Collapse = () => {
+  return (
+    <Suspense fallback={'*'}>
+      <CollapseBase />
+    </Suspense>
+  );
+};
+
+const FocusBase = dynamic<any>(() => import('./Icons/Focus'), {
+  suspense: true,
+});
+export const Focus = () => {
+  return (
+    <Suspense fallback={'*'}>
+      <FocusBase />
+    </Suspense>
+  );
+};

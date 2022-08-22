@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAppStoreDispatch, useAppStoreSelector } from './Redux-Store/hooks';
+import { setMetaDisplayState } from './Redux-Store/UserSlice';
 
 export const Meta = (props: { contentHTML: string; title: string }) => {
   const [hidden, setHidden] = useState(false);
+  const allMetaDisplayState = useAppStoreSelector(state => state.user.displayPreferences.allMetaDisplayState);
+  const dispatch = useAppStoreDispatch();
+  const focusMode = useAppStoreSelector(state => state.user.displayPreferences.focusMode);
 
-  return props.contentHTML.length ? (
+  useEffect(() => {
+    if(allMetaDisplayState === 'collapsed')
+      setHidden(true);
+    else if(allMetaDisplayState === 'expanded')
+      setHidden(false);
+  }, [allMetaDisplayState]);
+
+  return !focusMode && props.contentHTML.length ? (
     <div className="meta_data">
-      <div className="meta_data_title" onClick={() => setHidden((val) => !val)}>
+      <div className="meta_data_title" onClick={() => {
+        setHidden((val) => !val);
+        if(allMetaDisplayState !== null)
+          dispatch(setMetaDisplayState(null));
+      }}>
         {props.title}
       </div>
       <div

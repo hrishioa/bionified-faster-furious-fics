@@ -20,6 +20,7 @@ import { setUsername } from '@/components/Redux-Store/UserSlice';
 import Head from 'next/head';
 import { NavBar } from '@/components/Navbar';
 import useSubscribeActions from '@/components/CommandBar/SubMenus/useSubscribeActions';
+import useFocusActions from '@/components/CommandBar/SubMenus/useFocusActions';
 import { Meta } from '@/components/Meta';
 
 const WorkPage = (props: {
@@ -39,6 +40,7 @@ const WorkPage = (props: {
   }, [dispatch, work.meta]);
 
   useSubscribeActions();
+  useFocusActions();
 
   useEffect(() => {
     const saveScrollPosition = debounce(() => {

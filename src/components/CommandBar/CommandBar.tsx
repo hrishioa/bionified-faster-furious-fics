@@ -12,88 +12,9 @@ import {
 } from 'kbar';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Redux-Store/ReduxStore';
-import { BadCat, DarkModeIcon, Logout } from '../Icons';
-
-const actions = [
-  //TODO: Re-enable when font size is implemented
-  // {
-  //   id: 'fontsize',
-  //   name: 'Font Size',
-  //   keywords: 'interface font size',
-  //   section: 'Preferences',
-  // },
-  {
-    id: 'theme',
-    name: 'Change theme…',
-    icon: (
-      <div>
-        <DarkModeIcon />
-      </div>
-    ),
-    keywords: 'interface color dark light',
-    section: 'Preferences',
-  },
-  {
-    id: 'logout',
-    name: 'Logout',
-    icon: (
-      <div>
-        <Logout />
-      </div>
-    ),
-    keywords: 'logout user',
-    section: 'Preferences',
-    perform: () => {
-      console.log('document location is ', document.location);
-      document.location = `/login?logout=true&when_successful=${document.location.pathname}`;
-    },
-  },
-  {
-    id: 'darkTheme',
-    name: 'Dark',
-    keywords: 'dark theme',
-    section: 'Standard',
-    parent: 'theme',
-    perform: () => {
-      console.log('Setting dark mode');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    },
-  },
-  {
-    id: 'lightTheme',
-    name: 'Light',
-    keywords: 'light theme',
-    section: 'Standard',
-    parent: 'theme',
-    perform: () => {
-      document.documentElement.setAttribute('data-theme', 'light');
-    },
-  },
-  {
-    id: 'blueTheme',
-    name: 'Blue',
-    keywords: 'blue theme',
-    section: 'Exotic',
-    parent: 'theme',
-    perform: () => {
-      document.documentElement.setAttribute('data-theme', 'blue');
-    },
-  },
-  {
-    id: 'catAction',
-    name: 'Hello',
-    icon: (
-      <div>
-        <BadCat />
-      </div>
-    ),
-    subtitle: 'Why did you wake me?',
-    shortcut: ['c'],
-    keywords: 'cat',
-    section: 'Functions',
-    perform: () => window.open('https://www.youtube.com/watch?v=dEFGfu_tHsA'),
-  },
-];
+import { BadCat, Collapse, DarkModeIcon, Focus, Logout } from '../Icons';
+import { useAppStoreDispatch, useAppStoreSelector } from '../Redux-Store/hooks';
+import { setAllMeta, setFocusMode } from '../Redux-Store/WorksSlice';
 
 type ComplexResultItemProps = {
   action: ActionImpl;
@@ -222,6 +143,90 @@ export const CommandBar = ({
 }: {
   children?: JSX.Element | JSX.Element[];
 }) => {
+  const dispatch = useAppStoreDispatch();
+  const focusMode = useAppStoreSelector(state => state.work.focusMode);
+
+  const actions = [
+    //TODO: Re-enable when font size is implemented
+    // {
+    //   id: 'fontsize',
+    //   name: 'Font Size',
+    //   keywords: 'interface font size',
+    //   section: 'Preferences',
+    // },
+    {
+      id: 'theme',
+      name: 'Change theme…',
+      icon: (
+        <div>
+          <DarkModeIcon />
+        </div>
+      ),
+      keywords: 'interface color dark light',
+      section: 'Preferences',
+    },
+    {
+      id: 'logout',
+      name: 'Logout',
+      icon: (
+        <div>
+          <Logout />
+        </div>
+      ),
+      keywords: 'logout user',
+      section: 'Preferences',
+      perform: () => {
+        console.log('document location is ', document.location);
+        document.location = `/login?logout=true&when_successful=${document.location.pathname}`;
+      },
+    },
+    {
+      id: 'darkTheme',
+      name: 'Dark',
+      keywords: 'dark theme',
+      section: 'Standard',
+      parent: 'theme',
+      perform: () => {
+        console.log('Setting dark mode');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      },
+    },
+    {
+      id: 'lightTheme',
+      name: 'Light',
+      keywords: 'light theme',
+      section: 'Standard',
+      parent: 'theme',
+      perform: () => {
+        document.documentElement.setAttribute('data-theme', 'light');
+      },
+    },
+    {
+      id: 'blueTheme',
+      name: 'Blue',
+      keywords: 'blue theme',
+      section: 'Exotic',
+      parent: 'theme',
+      perform: () => {
+        document.documentElement.setAttribute('data-theme', 'blue');
+      },
+    },
+    {
+      id: 'catAction',
+      name: 'Hello',
+      icon: (
+        <div>
+          <BadCat />
+        </div>
+      ),
+      subtitle: 'Why did you wake me?',
+      shortcut: ['c'],
+      keywords: 'cat',
+      section: 'Functions',
+      perform: () => window.open('https://www.youtube.com/watch?v=dEFGfu_tHsA'),
+    },
+  ];
+
   return (
     <KBarProvider actions={actions}>
       <CommandBarLogic />
