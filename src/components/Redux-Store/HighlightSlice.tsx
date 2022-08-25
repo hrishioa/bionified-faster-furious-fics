@@ -23,7 +23,7 @@ const initialHighlightState: HighlightState = {
   jumpToHighlight: null,
 };
 
-const HIGHLIGHT_HASH_MAX = 1000000000;
+const HIGHLIGHT_HASH_MAX = 100000000;
 
 const highlightSlice = createSlice({
   name: 'highlight',
