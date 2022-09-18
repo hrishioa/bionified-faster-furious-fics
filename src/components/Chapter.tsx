@@ -1,3 +1,4 @@
+import { debounce } from 'lodash';
 import Image from 'next/image';
 import React, { Ref, useEffect, useRef, useState } from 'react';
 import { bioHTML } from 'utils/bionify';
@@ -81,7 +82,21 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jumpToThisChapter]);
 
-  function handleMouseTouchEnd() {
+  // TODO: Calling this android selection to note the complete lack of testing on iphone
+  function handleAndroidSelection(e: any) {
+    if(e.type === 'contextmenu') {
+      console.log('Firing debounced selection handler...');
+      handleMouseTouchEnd();
+    } else if(e.type === 'touchcancel') {
+      console.log('Cancelling selection handler...');
+      handleMouseTouchEnd.cancel();
+    }
+
+    // handleMouseTouchEnd();
+    return false;
+  }
+
+  const handleMouseTouchEnd = debounce(() => {
     const selection = window.getSelection();
 
     let selectedHTML = '';
@@ -104,13 +119,44 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
         chapterId: chapter.meta.id,
       }),
     );
-  }
+  }, 100);
 
   return (
     <div
       className={`chapter_container chapter_container_${chapter.meta.count}`}
       onMouseUp={handleMouseTouchEnd}
-      onTouchEnd={handleMouseTouchEnd}
+      // onTouchEnd={handleMouseTouchEnd}
+      // onSelect={handleGeneric}
+      // onPointerUp={handleGeneric}
+      // onPointerDown={handleGeneric}
+      // onPointerOut={handleGeneric}
+      // onPointerEnter={handleGeneric}
+      // onSelectCapture={handleGeneric}
+      // onClick ={handleGeneric}
+      // onContextMenu ={handleGeneric}
+      // onDoubleClick ={handleGeneric}
+      // onDrag ={handleGeneric}
+      // onDragEnd ={handleGeneric}
+      // onDragEnter ={handleGeneric}
+      // onDragExit
+      // ={handleGeneric}
+      // onDragLeave ={handleGeneric}
+      // onDragOver ={handleGeneric}
+      // onDragStart ={handleGeneric}
+      // onDrop ={handleGeneric}
+      // onMouseDown ={handleGeneric}
+      // onMouseEnter ={handleGeneric}
+      // onMouseLeave={handleGeneric}
+      // onMouseMove ={handleGeneric}
+      // onMouseOut ={handleGeneric}
+      // onMouseOver ={handleGeneric}
+
+      onContextMenu={handleAndroidSelection}
+      onTouchCancel ={handleAndroidSelection}
+      // onTouchEnd ={handleGeneric}
+      // onTouchMove ={handleGeneric}
+      // onTouchStart={handleGeneric}
+      // onMouseUp
     >
       <div
         ref={titleDivRef}
