@@ -7,6 +7,7 @@ export type UserState = {
   displayPreferences: {
     allMetaDisplayState: MetaDisplayState;
     focusMode: boolean;
+    speedReadingMode: boolean;
   };
 };
 
@@ -16,6 +17,7 @@ const initialUserState: UserState = {
   displayPreferences: {
     allMetaDisplayState: null,
     focusMode: false,
+    speedReadingMode: true
   },
 };
 
@@ -23,6 +25,9 @@ const userSlice = createSlice({
   name: 'user',
   initialState: initialUserState,
   reducers: {
+    setSpeedReadingMode: (state, action: PayloadAction<boolean>) => {
+      state.displayPreferences.speedReadingMode = action.payload;
+    },
     setUsername: (state, action: PayloadAction<string | null>) => {
       state.username = action.payload;
     },
@@ -46,6 +51,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUsername, login, logout, setFocusMode, setMetaDisplayState } =
+export const { setUsername, login, logout, setFocusMode, setMetaDisplayState, setSpeedReadingMode } =
   userSlice.actions;
 export default userSlice.reducer;

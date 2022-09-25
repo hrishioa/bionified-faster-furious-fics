@@ -21,6 +21,7 @@ import Head from 'next/head';
 import { NavBar } from '@/components/Navbar';
 import useSubscribeActions from '@/components/CommandBar/SubMenus/useSubscribeActions';
 import useFocusActions from '@/components/CommandBar/SubMenus/useFocusActions';
+import useSpeedReadingActions from '@/components/CommandBar/SubMenus/useSpeedReadingActions';
 import { Meta } from '@/components/Meta';
 import {
   fetchServerHighlights,
@@ -70,6 +71,7 @@ const WorkPage = (props: {
 
   useSubscribeActions();
   useFocusActions();
+  useSpeedReadingActions();
 
   useEffect(() => {
     let intervalRefresh: NodeJS.Timer | null;

@@ -24,10 +24,33 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
     startId: chapter.meta.id,
   });
   const highlights = useAppStoreSelector((state) => state.highlight.highlights);
+  const speedReadingMode = useAppStoreSelector(state => state.user.displayPreferences.speedReadingMode);
+
+  useEffect(() => {
+    if(showingChapterContent) {
+      window.setTimeout(() => {
+        if(speedReadingMode) {
+          const rests = document
+          .querySelector(`.chapter-${chapter.meta.id}`)
+          ?.querySelectorAll(':scope .bio-rest')
+          if(rests)
+            for(let i=0;i<rests.length;i++)
+              rests[i].classList.add('fast-reading-enabled');
+        } else {
+          const rests = document
+          .querySelector(`.chapter-${chapter.meta.id}`)
+          ?.querySelectorAll(':scope .bio-rest')
+
+          if(rests)
+            for(let i=0;i<rests.length;i++)
+              rests[i].classList.remove('fast-reading-enabled');
+        }
+      }, 0);
+    }
+  }, [showingChapterContent, speedReadingMode, chapter.meta.id]);
 
   useEffect(() => {
     if (showingChapterContent) {
-      console.log('Updating highlights to ', highlights);
       window.setTimeout(() => {
         updateChapterSavedHighlights(chapter.meta.id, highlights);
       }, 0);

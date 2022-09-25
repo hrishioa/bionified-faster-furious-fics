@@ -99,3 +99,14 @@ export const Focus = () => {
     </Suspense>
   );
 };
+
+const SpeedometerBase = dynamic<any>(() => import('./Icons/Speedometer'), {
+  suspense: true,
+});
+export const Speedometer = () => {
+  return (
+    <Suspense fallback={'*'}>
+      <SpeedometerBase />
+    </Suspense>
+  );
+};

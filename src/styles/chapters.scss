@@ -153,6 +153,10 @@
 
 .bio-rest {
   color: var(--rest-color);
+
+  &.fast-reading-enabled {
+    color: var(--rest-fast-color);
+  }
 }
 
 @media (max-width: 900px) {
