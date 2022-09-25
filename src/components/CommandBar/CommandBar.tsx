@@ -198,6 +198,16 @@ export const CommandBar = ({
       },
     },
     {
+      id: 'sepiaTheme',
+      name: 'Sepia',
+      keywords: 'sepia theme',
+      section: 'Exotic',
+      parent: 'theme',
+      perform: () => {
+        dispatch(setTheme('sepia'));
+      },
+    },
+    {
       id: 'blueTheme',
       name: 'Blue',
       keywords: 'blue theme',

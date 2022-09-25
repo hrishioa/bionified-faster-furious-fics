@@ -14,7 +14,7 @@ export type WorkInfo = {
   endNotesHTML: string;
 };
 
-export type ColorTheme = 'dark' | 'light' | 'blue';
+export type ColorTheme = 'dark' | 'light' | 'blue' | 'sepia';
 
 export const ALLOWED_COOKIES = [
   '_otwarchive_session',

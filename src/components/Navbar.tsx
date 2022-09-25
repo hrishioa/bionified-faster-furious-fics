@@ -92,7 +92,6 @@ export const NavBar: React.FC<any> = () => {
         <div className="username" onClick={openLogoutOption}>
           {username || 'Anonymous'}
         </div>
-        <Kudos />
         <DarkModeSwitch
           checked={theme === 'dark'}
           style={{
@@ -106,6 +105,7 @@ export const NavBar: React.FC<any> = () => {
           sunColor="var(--heading-color)"
         />
         <CommandBarIcon />
+        <Kudos />
       </div>
     </>
   );
