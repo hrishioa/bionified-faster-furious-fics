@@ -1,6 +1,28 @@
 /* @import url('https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&0&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;1,100;1,200;1,300;1,400;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap'); */
 
-:root {
+[data-theme='sepia'] {
+  --body-bg-color: rgb(244, 221, 209);
+  --text-color: rgb(95, 0, 0);
+  --cb-background: rgb(143 38 38);
+  --cb-a1: rgba(0 0 0 / 0.05);
+  --cb-a2: rgba(0 0 0 / 0.1);
+  --cb-foreground: rgb(44 43 192);
+  --cb-shadow: 0px 6px 20px rgb(0 0 0 / 20%);
+  --heading-color: rgb(255, 49, 69);
+  --rest-color: rgb(147 74 74);
+  --rest-fast-color: rgb(199 122 122);
+  --cb-overlay-color: rgba(150, 150, 150, 0.159);
+  --cb-transparent-background: rgba(255, 255, 255, 0.285);
+  --cb-placeholder-color: rgb(218 138 131);
+  --highlight-saved-background: hsl(180deg 100% 70%);
+  --highlight-background: rgb(3, 107, 107);
+  --highlight-text-color: white;
+  --link-unvisited-color: hsl(231deg 100% 60%);
+  --link-underline-color: hsl(231deg 100% 60%);
+  --link-visited-color: hsl(333deg 100% 43%);
+}
+
+:root [data-theme='white'] {
   --body-bg-color: white;
   --text-color: black;
   --cb-background: rgb(252 252 252);

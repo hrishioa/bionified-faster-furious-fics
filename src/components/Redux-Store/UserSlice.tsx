@@ -17,7 +17,7 @@ const initialUserState: UserState = {
   displayPreferences: {
     allMetaDisplayState: null,
     focusMode: false,
-    speedReadingMode: true
+    speedReadingMode: false
   },
 };
 
