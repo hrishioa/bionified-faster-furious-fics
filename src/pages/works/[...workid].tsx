@@ -11,12 +11,15 @@ import {
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { getWorkId, loadWork } from 'utils/fics';
 import { getChapterScrollPosition } from 'utils/scroll';
 import { ALLOWED_COOKIES, AO3Work } from 'utils/types';
 import debounce from 'lodash/debounce';
-import { setUsername } from '@/components/Redux-Store/UserSlice';
+import {
+  DisplayPreferences,
+  loadServerDisplayPreferences,
+  setUsername,
+} from '@/components/Redux-Store/UserSlice';
 import Head from 'next/head';
 import { NavBar } from '@/components/Navbar';
 import useSubscribeActions from '@/components/CommandBar/SubMenus/useSubscribeActions';
@@ -33,24 +36,58 @@ import {
   useAppStoreDispatch,
   useAppStoreSelector,
 } from '@/components/Redux-Store/hooks';
+import { makeRandomString } from 'utils/misc';
+import { DEVICE_ID_COOKIE } from 'utils/auth';
+import { getDisplayPreferences } from 'utils/server';
+import { useServerDisplayPreferences } from '@/components/hooks/useServerDisplayPreferences';
 
 const WorkPage = (props: {
   work: AO3Work;
   cookies: string[] | null;
   selectedChapter: number | null;
   selectedHighlightId: number | null;
+  displayPreferences: null | DisplayPreferences;
+  deviceId: string;
 }) => {
-  const { work, cookies, selectedChapter, selectedHighlightId } = props;
+  const {
+    work,
+    cookies,
+    selectedChapter,
+    selectedHighlightId,
+    deviceId,
+    displayPreferences,
+  } = props;
   const dispatch = useAppStoreDispatch();
   const jumpedChapter = useAppStoreSelector(
     (state: RootState) => state.work.jumpToChapter,
   );
 
-  const colorTheme = useAppStoreSelector(state => state.user.displayPreferences.theme);
+  const colorTheme = useAppStoreSelector(
+    (state) => state.user.displayPreferences.theme,
+  );
 
   const availableJumpToHighlight = useAppStoreSelector(
     (state) => state.highlight.jumpToHighlight?.availableHighlight,
   );
+
+  useEffect(() => {
+    const deviceCookieExpiry = new Date();
+    deviceCookieExpiry.setDate(deviceCookieExpiry.getDate() + 365);
+    document.cookie =
+      DEVICE_ID_COOKIE +
+      '=' +
+      deviceId +
+      '; expires=' +
+      deviceCookieExpiry.toUTCString() +
+      '; path=/';
+
+    dispatch(
+      loadServerDisplayPreferences({
+        deviceId,
+        displayPreferences,
+      }),
+    );
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', colorTheme);
@@ -78,6 +115,8 @@ const WorkPage = (props: {
   useSubscribeActions();
   useFocusActions();
   useSpeedReadingActions();
+
+  useServerDisplayPreferences();
 
   useEffect(() => {
     let intervalRefresh: NodeJS.Timer | null;
@@ -219,6 +258,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     return acc;
   }, [] as string[]);
 
+  const deviceId = ctx.req.cookies[DEVICE_ID_COOKIE] || makeRandomString(10);
+
   const selectedChapter = getChapterFromQuery(ctx.query);
   const selectedHighlightId = getHighlightIdFromQuery(ctx.query);
 
@@ -261,10 +302,21 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         };
     }
 
+    let displayPreferences = null;
+
+    if (workData.work && workData.work && workData.work.meta.username) {
+      displayPreferences = await getDisplayPreferences(
+        workData.work.meta.username,
+        deviceId,
+      );
+    }
+
     return {
       props: {
         work: workData?.work || null,
         cookies: workData?.cookies || null,
+        displayPreferences,
+        deviceId,
         selectedChapter,
         selectedHighlightId,
       },

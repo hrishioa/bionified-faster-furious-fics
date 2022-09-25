@@ -24,25 +24,27 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
     startId: chapter.meta.id,
   });
   const highlights = useAppStoreSelector((state) => state.highlight.highlights);
-  const speedReadingMode = useAppStoreSelector(state => state.user.displayPreferences.speedReadingMode);
+  const speedReadingMode = useAppStoreSelector(
+    (state) => state.user.displayPreferences.speedReadingMode,
+  );
 
   useEffect(() => {
-    if(showingChapterContent) {
+    if (showingChapterContent) {
       window.setTimeout(() => {
-        if(speedReadingMode) {
+        if (speedReadingMode) {
           const rests = document
-          .querySelector(`.chapter-${chapter.meta.id}`)
-          ?.querySelectorAll(':scope .bio-rest')
-          if(rests)
-            for(let i=0;i<rests.length;i++)
+            .querySelector(`.chapter-${chapter.meta.id}`)
+            ?.querySelectorAll(':scope .bio-rest');
+          if (rests)
+            for (let i = 0; i < rests.length; i++)
               rests[i].classList.add('fast-reading-enabled');
         } else {
           const rests = document
-          .querySelector(`.chapter-${chapter.meta.id}`)
-          ?.querySelectorAll(':scope .bio-rest')
+            .querySelector(`.chapter-${chapter.meta.id}`)
+            ?.querySelectorAll(':scope .bio-rest');
 
-          if(rests)
-            for(let i=0;i<rests.length;i++)
+          if (rests)
+            for (let i = 0; i < rests.length; i++)
               rests[i].classList.remove('fast-reading-enabled');
         }
       }, 0);
@@ -107,10 +109,10 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
 
   // TODO: Calling this android selection to note the complete lack of testing on iphone
   function handleAndroidSelection(e: any) {
-    if(e.type === 'contextmenu') {
+    if (e.type === 'contextmenu') {
       console.log('Firing debounced selection handler...');
       handleMouseTouchEnd();
-    } else if(e.type === 'touchcancel') {
+    } else if (e.type === 'touchcancel') {
       console.log('Cancelling selection handler...');
       handleMouseTouchEnd.cancel();
     }
@@ -175,7 +177,7 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
       // onMouseOver ={handleGeneric}
 
       onContextMenu={handleAndroidSelection}
-      onTouchCancel ={handleAndroidSelection}
+      onTouchCancel={handleAndroidSelection}
       // onTouchEnd ={handleGeneric}
       // onTouchMove ={handleGeneric}
       // onTouchStart={handleGeneric}
