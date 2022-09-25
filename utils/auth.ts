@@ -3,6 +3,8 @@ import * as ToughCookie from 'tough-cookie';
 import * as ACSupport from 'axios-cookiejar-support';
 import axios from 'axios';
 
+export const DEVICE_ID_COOKIE = 'bf3_device_id';
+
 export function getCookiedClient(
   cookies: Partial<{
     [key: string]: string;

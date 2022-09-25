@@ -11,12 +11,15 @@ import {
 import { GetServerSidePropsContext } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { getWorkId, loadWork } from 'utils/fics';
-import { getChapterScrollPosition } from 'utils/scroll';
-import { ALLOWED_COOKIES, AO3Work } from 'utils/types';
+import { getChapterScrollPosition, SHORT_PAUSE_MS } from 'utils/scroll';
+import { ALLOWED_COOKIES, AO3Work, UserWorkInfo } from 'utils/types';
 import debounce from 'lodash/debounce';
-import { setUsername } from '@/components/Redux-Store/UserSlice';
+import {
+  DisplayPreferences,
+  loadServerDisplayPreferences,
+  setUsername,
+} from '@/components/Redux-Store/UserSlice';
 import Head from 'next/head';
 import { NavBar } from '@/components/Navbar';
 import useSubscribeActions from '@/components/CommandBar/SubMenus/useSubscribeActions';
@@ -33,22 +36,82 @@ import {
   useAppStoreDispatch,
   useAppStoreSelector,
 } from '@/components/Redux-Store/hooks';
+import { makeRandomString } from 'utils/misc';
+import { DEVICE_ID_COOKIE } from 'utils/auth';
+import {
+  getDisplayPreferences,
+  getUserWorkInfo,
+  savePausedPosition,
+} from 'utils/server';
+import { useServerDisplayPreferences } from '@/components/hooks/useServerDisplayPreferences';
 
 const WorkPage = (props: {
   work: AO3Work;
   cookies: string[] | null;
   selectedChapter: number | null;
   selectedHighlightId: number | null;
+  displayPreferences: null | DisplayPreferences;
+  userWorkInfo: UserWorkInfo | null;
+  deviceId: string;
 }) => {
-  const { work, cookies, selectedChapter, selectedHighlightId } = props;
+  const {
+    work,
+    cookies,
+    selectedChapter,
+    selectedHighlightId,
+    deviceId,
+    displayPreferences,
+    userWorkInfo,
+  } = props;
   const dispatch = useAppStoreDispatch();
-  const jumpedChapter = useSelector(
+  const jumpedChapter = useAppStoreSelector(
     (state: RootState) => state.work.jumpToChapter,
+  );
+
+  const username = useAppStoreSelector((state) => state.user.username);
+
+  const colorTheme = useAppStoreSelector(
+    (state) => state.user.displayPreferences.theme,
   );
 
   const availableJumpToHighlight = useAppStoreSelector(
     (state) => state.highlight.jumpToHighlight?.availableHighlight,
   );
+
+  useEffect(() => {
+    const deviceCookieExpiry = new Date();
+    deviceCookieExpiry.setDate(deviceCookieExpiry.getDate() + 365);
+    document.cookie =
+      DEVICE_ID_COOKIE +
+      '=' +
+      deviceId +
+      '; expires=' +
+      deviceCookieExpiry.toUTCString() +
+      '; path=/';
+
+    dispatch(
+      loadServerDisplayPreferences({
+        deviceId,
+        displayPreferences,
+      }),
+    );
+
+    if (userWorkInfo) {
+      if (!availableJumpToHighlight && userWorkInfo.lastPausedPosition) {
+        dispatch(
+          setScroll({
+            chapterId: userWorkInfo.lastPausedPosition.chapterId,
+            scrollPercentage: userWorkInfo.lastPausedPosition.scrollPosition,
+          }),
+        );
+        dispatch(jumpToChapter(userWorkInfo.lastPausedPosition.chapterId));
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', colorTheme);
+  }, [colorTheme]);
 
   useEffect(() => {
     if (availableJumpToHighlight) {
@@ -73,6 +136,8 @@ const WorkPage = (props: {
   useFocusActions();
   useSpeedReadingActions();
 
+  useServerDisplayPreferences();
+
   useEffect(() => {
     let intervalRefresh: NodeJS.Timer | null;
 
@@ -91,6 +156,15 @@ const WorkPage = (props: {
   }, [dispatch, work.meta]);
 
   useEffect(() => {
+    const markPaused = debounce((chapterId: number, scrollPosition: number) => {
+      if (username) {
+        savePausedPosition(username, work.meta.id, {
+          chapterId,
+          scrollPosition,
+        });
+      }
+    }, SHORT_PAUSE_MS);
+
     const saveScrollPosition = debounce(() => {
       const { chapterId, scrollPosition } = getChapterScrollPosition(
         document,
@@ -99,6 +173,7 @@ const WorkPage = (props: {
       dispatch(
         setScroll({ chapterId, scrollPercentage: scrollPosition * 100 }),
       );
+      markPaused(chapterId, scrollPosition);
       return;
     }, 100);
 
@@ -110,6 +185,7 @@ const WorkPage = (props: {
 
     return () => {
       saveScrollPosition.cancel();
+      markPaused.cancel();
       document.removeEventListener('scroll', saveScrollPosition);
     };
   }, [work, dispatch]);
@@ -121,7 +197,8 @@ const WorkPage = (props: {
   }, [work, dispatch]);
 
   useEffect(() => {
-    if (selectedChapter) dispatch(jumpToChapter(selectedChapter));
+    if (selectedChapter && !userWorkInfo?.lastPausedPosition)
+      dispatch(jumpToChapter(selectedChapter));
   }, [selectedChapter, dispatch]);
 
   useEffect(() => {
@@ -213,6 +290,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     return acc;
   }, [] as string[]);
 
+  const deviceId = ctx.req.cookies[DEVICE_ID_COOKIE] || makeRandomString(10);
+
   const selectedChapter = getChapterFromQuery(ctx.query);
   const selectedHighlightId = getHighlightIdFromQuery(ctx.query);
 
@@ -255,10 +334,28 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         };
     }
 
+    let displayPreferences = null,
+      userWorkInfo = null;
+
+    if (workData.work && workData.work && workData.work.meta.username) {
+      displayPreferences = await getDisplayPreferences(
+        workData.work.meta.username,
+        deviceId,
+      );
+
+      userWorkInfo = await getUserWorkInfo(
+        workData.work.meta.username,
+        workData.work.meta.id,
+      );
+    }
+
     return {
       props: {
         work: workData?.work || null,
         cookies: workData?.cookies || null,
+        displayPreferences,
+        userWorkInfo,
+        deviceId,
         selectedChapter,
         selectedHighlightId,
       },

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ChapterMeta, WorkInfo } from 'utils/types';
+import { ChapterMeta, UserWorkInfo, WorkInfo } from 'utils/types';
 
 export type MetaDisplayState = 'collapsed' | 'expanded' | null;
 
@@ -11,6 +11,7 @@ export type WorkState = {
   currentChapterId: number;
   chapterScrollPercentage: number;
   jumpToChapter: null | number;
+  finished: boolean;
 };
 
 const initialWorkState: WorkState = {
@@ -19,6 +20,7 @@ const initialWorkState: WorkState = {
   currentChapterId: 0,
   chapterScrollPercentage: 0,
   jumpToChapter: null,
+  finished: false
 };
 
 const workSlice = createSlice({
@@ -39,6 +41,11 @@ const workSlice = createSlice({
     },
     setCurrentChapter: (state, action: PayloadAction<number>) => {
       state.currentChapterId = action.payload;
+    },
+    setUserWorkInfo: (state, action: PayloadAction<UserWorkInfo>) => {
+      state.finished = action.payload.finished;
+      state.currentChapterId = action.payload.lastPausedPosition.chapterId;
+      state.chapterScrollPercentage = action.payload.lastPausedPosition.scrollPosition;
     },
     jumpToChapter: (state, action: PayloadAction<number | null>) => {
       state.jumpToChapter = action.payload;
@@ -66,6 +73,7 @@ export const {
   setScroll,
   jumpToChapter,
   setWorkInfo,
+  setUserWorkInfo,
   addKudos,
 } = workSlice.actions;
 export default workSlice.reducer;

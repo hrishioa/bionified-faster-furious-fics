@@ -18,31 +18,35 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
   const dispatch = useAppStoreDispatch();
 
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
+  const textDivRef: Ref<HTMLDivElement> = useRef(null);
   const [showingChapterContent, showChapterContent] = useState(false);
   const safeChapterContent = bioHTML(chapter.textDivHTML, {
     prefix: String(chapter.meta.count),
     startId: chapter.meta.id,
   });
   const highlights = useAppStoreSelector((state) => state.highlight.highlights);
-  const speedReadingMode = useAppStoreSelector(state => state.user.displayPreferences.speedReadingMode);
+  const speedReadingMode = useAppStoreSelector(
+    (state) => state.user.displayPreferences.speedReadingMode,
+  );
+  const scrollWithinThisChapter = useAppStoreSelector(state => state.work.currentChapterId === chapter.meta.id ? state.work.chapterScrollPercentage : null);
 
   useEffect(() => {
-    if(showingChapterContent) {
+    if (showingChapterContent) {
       window.setTimeout(() => {
-        if(speedReadingMode) {
+        if (speedReadingMode) {
           const rests = document
-          .querySelector(`.chapter-${chapter.meta.id}`)
-          ?.querySelectorAll(':scope .bio-rest')
-          if(rests)
-            for(let i=0;i<rests.length;i++)
+            .querySelector(`.chapter-${chapter.meta.id}`)
+            ?.querySelectorAll(':scope .bio-rest');
+          if (rests)
+            for (let i = 0; i < rests.length; i++)
               rests[i].classList.add('fast-reading-enabled');
         } else {
           const rests = document
-          .querySelector(`.chapter-${chapter.meta.id}`)
-          ?.querySelectorAll(':scope .bio-rest')
+            .querySelector(`.chapter-${chapter.meta.id}`)
+            ?.querySelectorAll(':scope .bio-rest');
 
-          if(rests)
-            for(let i=0;i<rests.length;i++)
+          if (rests)
+            for (let i = 0; i < rests.length; i++)
               rests[i].classList.remove('fast-reading-enabled');
         }
       }, 0);
@@ -92,14 +96,22 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
       let waitToScrollMs = 0;
       if (!showingChapterContent) {
         showChapterContent(true);
-        waitToScrollMs = 150;
+        waitToScrollMs = 300;
       }
       window.setTimeout(() => {
-        if (titleDivRef.current)
-          titleDivRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
+        if(scrollWithinThisChapter === null) {
+          if (titleDivRef.current)
+            titleDivRef.current.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+        } else {
+          if(textDivRef.current) {
+            const bounds = textDivRef.current.getBoundingClientRect();
+            window.scroll({top: bounds.top + window.scrollY + (bounds.height * scrollWithinThisChapter)});
+          }
+        }
+
       }, waitToScrollMs);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,10 +119,10 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
 
   // TODO: Calling this android selection to note the complete lack of testing on iphone
   function handleAndroidSelection(e: any) {
-    if(e.type === 'contextmenu') {
+    if (e.type === 'contextmenu') {
       console.log('Firing debounced selection handler...');
       handleMouseTouchEnd();
-    } else if(e.type === 'touchcancel') {
+    } else if (e.type === 'touchcancel') {
       console.log('Cancelling selection handler...');
       handleMouseTouchEnd.cancel();
     }
@@ -148,38 +160,8 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
     <div
       className={`chapter_container chapter_container_${chapter.meta.count}`}
       onMouseUp={handleMouseTouchEnd}
-      // onTouchEnd={handleMouseTouchEnd}
-      // onSelect={handleGeneric}
-      // onPointerUp={handleGeneric}
-      // onPointerDown={handleGeneric}
-      // onPointerOut={handleGeneric}
-      // onPointerEnter={handleGeneric}
-      // onSelectCapture={handleGeneric}
-      // onClick ={handleGeneric}
-      // onContextMenu ={handleGeneric}
-      // onDoubleClick ={handleGeneric}
-      // onDrag ={handleGeneric}
-      // onDragEnd ={handleGeneric}
-      // onDragEnter ={handleGeneric}
-      // onDragExit
-      // ={handleGeneric}
-      // onDragLeave ={handleGeneric}
-      // onDragOver ={handleGeneric}
-      // onDragStart ={handleGeneric}
-      // onDrop ={handleGeneric}
-      // onMouseDown ={handleGeneric}
-      // onMouseEnter ={handleGeneric}
-      // onMouseLeave={handleGeneric}
-      // onMouseMove ={handleGeneric}
-      // onMouseOut ={handleGeneric}
-      // onMouseOver ={handleGeneric}
-
       onContextMenu={handleAndroidSelection}
-      onTouchCancel ={handleAndroidSelection}
-      // onTouchEnd ={handleGeneric}
-      // onTouchMove ={handleGeneric}
-      // onTouchStart={handleGeneric}
-      // onMouseUp
+      onTouchCancel={handleAndroidSelection}
     >
       <div
         ref={titleDivRef}
@@ -199,6 +181,7 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
       )}
       <div
         className={`chapter_text chapter-${chapter.meta.id}`}
+        ref={textDivRef}
         dangerouslySetInnerHTML={{
           __html: (showingChapterContent && safeChapterContent) || '',
         }}

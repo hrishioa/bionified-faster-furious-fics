@@ -3,16 +3,16 @@ import {
   useAppStoreDispatch,
   useAppStoreSelector,
 } from '@/components/Redux-Store/hooks';
-import {
-  setSpeedReadingMode
-} from '@/components/Redux-Store/UserSlice';
+import { setSpeedReadingMode } from '@/components/Redux-Store/UserSlice';
 import { useKBar } from 'kbar';
 import React, { useEffect } from 'react';
 
 export default function useSpeedReadingActions() {
   const { query } = useKBar();
 
-  const speedReadingMode = useAppStoreSelector((state) => state.user.displayPreferences.speedReadingMode);
+  const speedReadingMode = useAppStoreSelector(
+    (state) => state.user.displayPreferences.speedReadingMode,
+  );
   const dispatch = useAppStoreDispatch();
 
   useEffect(() => {
@@ -52,14 +52,11 @@ export default function useSpeedReadingActions() {
       });
     }
 
-    const deregisterExistingActions = query.registerActions(speedReadingActions);
+    const deregisterExistingActions =
+      query.registerActions(speedReadingActions);
 
     return () => {
       if (deregisterExistingActions) deregisterExistingActions();
     };
-  }, [
-    query,
-    dispatch,
-    speedReadingMode
-  ]);
+  }, [query, dispatch, speedReadingMode]);
 }
