@@ -264,6 +264,13 @@ function processWork(workDOM: cheerio.CheerioAPI, workId: number): AO3Work {
 
   const kudos = parseInt(workDOM('dd.kudos').text());
 
+  chapters.forEach((chapter, index) => {
+    if(isNaN(chapter.meta.id))
+      chapter.meta.id = workId + index;
+    if(isNaN(chapter.meta.count))
+      chapter.meta.count = index + 1;
+  })
+
 
   console.timeEnd('Processed fic');
 
