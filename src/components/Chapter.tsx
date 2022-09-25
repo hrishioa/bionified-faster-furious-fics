@@ -18,6 +18,7 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
   const dispatch = useAppStoreDispatch();
 
   const titleDivRef: Ref<HTMLDivElement> = useRef(null);
+  const textDivRef: Ref<HTMLDivElement> = useRef(null);
   const [showingChapterContent, showChapterContent] = useState(false);
   const safeChapterContent = bioHTML(chapter.textDivHTML, {
     prefix: String(chapter.meta.count),
@@ -27,6 +28,7 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
   const speedReadingMode = useAppStoreSelector(
     (state) => state.user.displayPreferences.speedReadingMode,
   );
+  const scrollWithinThisChapter = useAppStoreSelector(state => state.work.currentChapterId === chapter.meta.id ? state.work.chapterScrollPercentage : null);
 
   useEffect(() => {
     if (showingChapterContent) {
@@ -94,14 +96,22 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
       let waitToScrollMs = 0;
       if (!showingChapterContent) {
         showChapterContent(true);
-        waitToScrollMs = 150;
+        waitToScrollMs = 300;
       }
       window.setTimeout(() => {
-        if (titleDivRef.current)
-          titleDivRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
+        if(scrollWithinThisChapter === null) {
+          if (titleDivRef.current)
+            titleDivRef.current.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+        } else {
+          if(textDivRef.current) {
+            const bounds = textDivRef.current.getBoundingClientRect();
+            window.scroll({top: bounds.top + window.scrollY + (bounds.height * scrollWithinThisChapter)});
+          }
+        }
+
       }, waitToScrollMs);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -150,38 +160,8 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
     <div
       className={`chapter_container chapter_container_${chapter.meta.count}`}
       onMouseUp={handleMouseTouchEnd}
-      // onTouchEnd={handleMouseTouchEnd}
-      // onSelect={handleGeneric}
-      // onPointerUp={handleGeneric}
-      // onPointerDown={handleGeneric}
-      // onPointerOut={handleGeneric}
-      // onPointerEnter={handleGeneric}
-      // onSelectCapture={handleGeneric}
-      // onClick ={handleGeneric}
-      // onContextMenu ={handleGeneric}
-      // onDoubleClick ={handleGeneric}
-      // onDrag ={handleGeneric}
-      // onDragEnd ={handleGeneric}
-      // onDragEnter ={handleGeneric}
-      // onDragExit
-      // ={handleGeneric}
-      // onDragLeave ={handleGeneric}
-      // onDragOver ={handleGeneric}
-      // onDragStart ={handleGeneric}
-      // onDrop ={handleGeneric}
-      // onMouseDown ={handleGeneric}
-      // onMouseEnter ={handleGeneric}
-      // onMouseLeave={handleGeneric}
-      // onMouseMove ={handleGeneric}
-      // onMouseOut ={handleGeneric}
-      // onMouseOver ={handleGeneric}
-
       onContextMenu={handleAndroidSelection}
       onTouchCancel={handleAndroidSelection}
-      // onTouchEnd ={handleGeneric}
-      // onTouchMove ={handleGeneric}
-      // onTouchStart={handleGeneric}
-      // onMouseUp
     >
       <div
         ref={titleDivRef}
@@ -201,6 +181,7 @@ const Chapter = ({ chapter, jumpToThisChapter }: ChapterProps) => {
       )}
       <div
         className={`chapter_text chapter-${chapter.meta.id}`}
+        ref={textDivRef}
         dangerouslySetInnerHTML={{
           __html: (showingChapterContent && safeChapterContent) || '',
         }}

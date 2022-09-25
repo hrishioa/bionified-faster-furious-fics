@@ -42,6 +42,16 @@ export type ToolbarPosition = Partial<
   Pick<CSSProperties, 'top' | 'left' | 'right' | 'height' | 'width' | 'display'>
 >;
 
+export type ScrollPosition = {
+  chapterId: number;
+  scrollPosition: number;
+};
+
+export type UserWorkInfo = {
+  finished: false,
+  lastPausedPosition: ScrollPosition
+}
+
 export type AO3Work = {
   meta: WorkInfo;
   chapters: AO3Chapter[];

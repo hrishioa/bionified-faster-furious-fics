@@ -1,4 +1,6 @@
-import { ChapterMeta } from './types';
+import { ChapterMeta, ScrollPosition } from './types';
+
+export const SHORT_PAUSE_MS = 5000;
 
 export const getScrollPosition = (element: Element) => {
   if (element.getBoundingClientRect().height <= 0) return null;
@@ -16,10 +18,7 @@ export const getScrollPosition = (element: Element) => {
 export const getChapterScrollPosition = (
   document: Document,
   chapterInfo: ChapterMeta[],
-): {
-  chapterId: number;
-  scrollPosition: number;
-} => {
+): ScrollPosition => {
   let chapterId: number | null = null;
   let scrollPosition = 0;
 

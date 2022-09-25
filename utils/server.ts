@@ -1,12 +1,61 @@
 import { DisplayPreferences, initialDisplayPreferences } from '@/components/Redux-Store/UserSlice';
-import { Highlight } from './types';
+import { Highlight, ScrollPosition, UserWorkInfo } from './types';
 
-const LOCAL_SERVER_URL = 'http://localhost:4000';
 // const SERVER_URL = 'http://localhost:4001';
 const SERVER_URL = 'https://api.archiveofherown.org';
 
+export async function getUserWorkInfo(username: string, workId: number) {
+  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL}/userwork/getInfo`;
+
+  const body = {
+    username,
+    workId
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(body)
+    })
+
+    const data = await res.json();
+
+    if(data.success)
+      return data.userWork as UserWorkInfo;
+  } catch(err) {
+    console.error('Error Calling ',url,' with data ', body, ' - ', err);
+  }
+
+  return null;
+}
+
+export async function savePausedPosition(username: string, workId: number, pausePosition: ScrollPosition) {
+  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL}/userwork/setPausePosition`;
+
+  const body = {
+    username,
+    workId,
+    pausePosition
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(body)
+    })
+  } catch(err) {
+    console.error('Error Calling ',url,' with data ', body, ' - ', err);
+  }
+}
+
 export async function getDisplayPreferences(username: string, deviceId: string) {
-  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL || LOCAL_SERVER_URL}/preferences/display/get`;
+  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL}/preferences/display/get`;
 
   const body = {
     username,
@@ -35,7 +84,7 @@ export async function getDisplayPreferences(username: string, deviceId: string) 
 }
 
 export async function saveDisplayPreferences(username: string, deviceId: string, displayPreferences: DisplayPreferences) {
-  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL || LOCAL_SERVER_URL}/preferences/display/upsert`;
+  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL}/preferences/display/upsert`;
 
   const body = {
     username,
@@ -59,7 +108,7 @@ export async function saveDisplayPreferences(username: string, deviceId: string,
 }
 
 export async function serverGetHighlights(workId: number) {
-  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL || LOCAL_SERVER_URL}/highlight/getAllForWork`;
+  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL}/highlight/getAllForWork`;
   const body = { workId };
 
   try {
@@ -96,7 +145,7 @@ export async function serverDeleteHighlight(highlight: Highlight, username: stri
 async function serverEditHighlight(highlight: Highlight, username: string, workId: number, opType: 'delete' | 'upsert') {
   console.log('Saving highlight ',highlight, ' for user ',username,' and work ',workId);
 
-  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL || LOCAL_SERVER_URL}/highlight/upsert`;
+  const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL}/highlight/upsert`;
   const body = {
     creator: username,
     workId: workId,
