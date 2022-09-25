@@ -42,13 +42,19 @@ const WorkPage = (props: {
 }) => {
   const { work, cookies, selectedChapter, selectedHighlightId } = props;
   const dispatch = useAppStoreDispatch();
-  const jumpedChapter = useSelector(
+  const jumpedChapter = useAppStoreSelector(
     (state: RootState) => state.work.jumpToChapter,
   );
+
+  const colorTheme = useAppStoreSelector(state => state.user.displayPreferences.theme);
 
   const availableJumpToHighlight = useAppStoreSelector(
     (state) => state.highlight.jumpToHighlight?.availableHighlight,
   );
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', colorTheme);
+  }, [colorTheme]);
 
   useEffect(() => {
     if (availableJumpToHighlight) {

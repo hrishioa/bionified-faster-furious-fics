@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ColorTheme } from 'utils/types';
 import { MetaDisplayState } from './WorksSlice';
 
 export type UserState = {
@@ -8,6 +9,7 @@ export type UserState = {
     allMetaDisplayState: MetaDisplayState;
     focusMode: boolean;
     speedReadingMode: boolean;
+    theme: ColorTheme;
   };
 };
 
@@ -17,7 +19,8 @@ const initialUserState: UserState = {
   displayPreferences: {
     allMetaDisplayState: null,
     focusMode: false,
-    speedReadingMode: true
+    speedReadingMode: true,
+    theme: 'light'
   },
 };
 
@@ -27,6 +30,9 @@ const userSlice = createSlice({
   reducers: {
     setSpeedReadingMode: (state, action: PayloadAction<boolean>) => {
       state.displayPreferences.speedReadingMode = action.payload;
+    },
+    setTheme: (state, action: PayloadAction<ColorTheme>) => {
+      state.displayPreferences.theme = action.payload;
     },
     setUsername: (state, action: PayloadAction<string | null>) => {
       state.username = action.payload;
@@ -51,6 +57,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUsername, login, logout, setFocusMode, setMetaDisplayState, setSpeedReadingMode } =
+export const { setUsername, login, logout, setFocusMode, setMetaDisplayState, setSpeedReadingMode, setTheme } =
   userSlice.actions;
 export default userSlice.reducer;

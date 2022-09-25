@@ -13,6 +13,8 @@ import {
 import { useSelector } from 'react-redux';
 import { RootState } from '../Redux-Store/ReduxStore';
 import { BadCat, DarkModeIcon, Logout } from '../Icons';
+import { useAppStoreDispatch } from '../Redux-Store/hooks';
+import { setTheme } from '../Redux-Store/UserSlice';
 
 type ComplexResultItemProps = {
   action: ActionImpl;
@@ -139,6 +141,8 @@ export const CommandBar = ({
 }: {
   children?: JSX.Element | JSX.Element[];
 }) => {
+  const dispatch = useAppStoreDispatch();
+
   const actions = [
     //TODO: Re-enable when font size is implemented
     // {
@@ -180,8 +184,7 @@ export const CommandBar = ({
       section: 'Standard',
       parent: 'theme',
       perform: () => {
-        console.log('Setting dark mode');
-        document.documentElement.setAttribute('data-theme', 'dark');
+        dispatch(setTheme('dark'));
       },
     },
     {
@@ -191,7 +194,7 @@ export const CommandBar = ({
       section: 'Standard',
       parent: 'theme',
       perform: () => {
-        document.documentElement.setAttribute('data-theme', 'light');
+        dispatch(setTheme('light'));
       },
     },
     {
@@ -201,7 +204,7 @@ export const CommandBar = ({
       section: 'Exotic',
       parent: 'theme',
       perform: () => {
-        document.documentElement.setAttribute('data-theme', 'blue');
+        dispatch(setTheme('light'));
       },
     },
     {
