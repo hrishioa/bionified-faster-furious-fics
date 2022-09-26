@@ -1,8 +1,8 @@
 import { DisplayPreferences, initialDisplayPreferences } from '@/components/Redux-Store/UserSlice';
 import { Highlight, ScrollPosition, UserWorkInfo } from './types';
 
-// const SERVER_URL = 'http://localhost:4001';
-const SERVER_URL = 'https://api.archiveofherown.org';
+const SERVER_URL = 'http://localhost:4001';
+// const SERVER_URL = 'https://api.archiveofherown.org';
 
 export async function getUserWorkInfo(username: string, workId: number) {
   const url = `${process.env.REACT_APP_SERVER_URL || SERVER_URL}/userwork/getInfo`;
@@ -40,6 +40,8 @@ export async function savePausedPosition(username: string, workId: number, pause
     workId,
     pausePosition
   }
+
+  console.log('Saving pause position to server - ',body);
 
   try {
     const res = await fetch(url, {

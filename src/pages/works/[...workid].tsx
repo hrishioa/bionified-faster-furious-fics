@@ -63,7 +63,10 @@ const WorkPage = (props: {
     displayPreferences,
     userWorkInfo,
   } = props;
+
   const dispatch = useAppStoreDispatch();
+
+  //############ State variables ######################################
   const jumpedChapter = useAppStoreSelector(
     (state: RootState) => state.work.jumpToChapter,
   );
@@ -78,6 +81,10 @@ const WorkPage = (props: {
     (state) => state.highlight.jumpToHighlight?.availableHighlight,
   );
 
+  //################## useEffects #######################################
+
+
+  // Runs once: Refresh device id cookie, and set display preferences into store
   useEffect(() => {
     const deviceCookieExpiry = new Date();
     deviceCookieExpiry.setDate(deviceCookieExpiry.getDate() + 365);
@@ -95,49 +102,15 @@ const WorkPage = (props: {
         displayPreferences,
       }),
     );
-
-    if (userWorkInfo) {
-      if (!availableJumpToHighlight && userWorkInfo.lastPausedPosition) {
-        dispatch(
-          setScroll({
-            chapterId: userWorkInfo.lastPausedPosition.chapterId,
-            scrollPercentage: userWorkInfo.lastPausedPosition.scrollPosition,
-          }),
-        );
-        dispatch(jumpToChapter(userWorkInfo.lastPausedPosition.chapterId));
-      }
-    }
   }, []);
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', colorTheme);
-  }, [colorTheme]);
-
-  useEffect(() => {
-    if (availableJumpToHighlight) {
-      dispatch(jumpToChapter(availableJumpToHighlight.chapterId));
-      dispatch(selectSavedHighlight(availableJumpToHighlight.id));
-      dispatch(highlightJumpFinished());
-    }
-  }, [availableJumpToHighlight]);
-
-  useEffect(() => {
-    if (selectedHighlightId) {
-      dispatch(requestJumpToHighlight(selectedHighlightId));
-    }
-  }, [selectedHighlightId]);
-
+  // Runs once: Set work information and username
   useEffect(() => {
     dispatch(setWorkInfo(work.meta));
     dispatch(setUsername(work?.meta.username || null));
-  }, [dispatch, work.meta]);
+  }, []);
 
-  useSubscribeActions();
-  useFocusActions();
-  useSpeedReadingActions();
-
-  useServerDisplayPreferences();
-
+  // Runs once: Create an interval to refresh highlights for this work
   useEffect(() => {
     let intervalRefresh: NodeJS.Timer | null;
 
@@ -155,6 +128,18 @@ const WorkPage = (props: {
     };
   }, [dispatch, work.meta]);
 
+  // Runs when theme changes: Apply this theme to the css of the html element.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', colorTheme);
+  }, [colorTheme]);
+
+  useSubscribeActions();
+  useFocusActions();
+  useSpeedReadingActions();
+
+  useServerDisplayPreferences();
+
+  // Runs on every render: Teardown and create a new event handler for registering scroll events
   useEffect(() => {
     const markPaused = debounce((chapterId: number, scrollPosition: number) => {
       if (username) {
@@ -178,6 +163,7 @@ const WorkPage = (props: {
     }, 100);
 
     if (document) {
+      console.log('Registering scroll listener');
       document.addEventListener('scroll', saveScrollPosition, {
         passive: true,
       });
@@ -188,26 +174,17 @@ const WorkPage = (props: {
       markPaused.cancel();
       document.removeEventListener('scroll', saveScrollPosition);
     };
-  }, [work, dispatch]);
+  });
 
+  // Runs once: Set chapter meta
   useEffect(() => {
     dispatch(
       setChapterMeta(work?.chapters.map((chapter) => chapter.meta) || []),
     );
   }, [work, dispatch]);
 
-  useEffect(() => {
-    if (selectedChapter && !userWorkInfo?.lastPausedPosition)
-      dispatch(jumpToChapter(selectedChapter));
-  }, [selectedChapter, dispatch]);
 
-  useEffect(() => {
-    dispatch(
-      setCurrentChapter(selectedChapter || work?.chapters[0].meta.id || 0),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  // Runs once: set cookies from work
   useEffect(() => {
     (window as any).work = work;
     if (cookies) {
@@ -215,7 +192,82 @@ const WorkPage = (props: {
         (cookie) => (document.cookie = cookie.replace(/HttpOnly/i, '')),
       );
     }
-  });
+  }, []);
+
+  //####################################### Chapter jumping state management
+
+  useEffect(() => {
+    if(selectedHighlightId) {
+      console.log('There is a selected highlight ',selectedHighlightId,', jumping to this highlight when it loads.');
+      dispatch(requestJumpToHighlight(selectedHighlightId));
+    } else if(userWorkInfo && userWorkInfo.lastPausedPosition) {
+      console.log('There is a paused position for this work - ',userWorkInfo.lastPausedPosition,', jumping there.');
+      dispatch(
+        setScroll({
+          chapterId: userWorkInfo.lastPausedPosition.chapterId,
+          scrollPercentage: userWorkInfo.lastPausedPosition.scrollPosition,
+        }),
+      );
+      dispatch(jumpToChapter(userWorkInfo.lastPausedPosition.chapterId));
+    } else if(selectedChapter) {
+      console.log('There is a selected chapter ',selectedChapter,', jumping there');
+      dispatch(jumpToChapter(selectedChapter));
+    } else {
+      console.log('No other jumps exist, setting current chapter to ',selectedChapter || work?.chapters[0].meta.id || 0);
+      dispatch(
+        setCurrentChapter(selectedChapter || work?.chapters[0].meta.id || 0),
+      );
+    }
+  }, []);
+
+  // Runs once: If there is a selected highlight id, dispatch a jump to this highlight.
+  // useEffect(() => {
+  //   if (selectedHighlightId) {
+  //     dispatch(requestJumpToHighlight(selectedHighlightId));
+  //   }
+  // }, []);
+
+  // Runs once: Jump to a chapter if there isn't already a jump to highlight.
+  // useEffect(() => {
+  //   if (selectedChapter && !userWorkInfo?.lastPausedPosition)
+  //     dispatch(jumpToChapter(selectedChapter));
+  // }, [selectedChapter, dispatch]);
+
+  // Runs once: Set current chapter from link.
+  // useEffect(() => {
+  //   dispatch(
+  //     setCurrentChapter(selectedChapter || work?.chapters[0].meta.id || 0),
+  //   );
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
+  // Runs when there is an available highlight to jump to, actually jumps to this highlight position.
+  useEffect(() => {
+    if (availableJumpToHighlight) {
+      console.log('Highlight is not available to jump to ',availableJumpToHighlight,', jumping');
+      dispatch(jumpToChapter(availableJumpToHighlight.chapterId));
+      dispatch(selectSavedHighlight(availableJumpToHighlight.id));
+      dispatch(highlightJumpFinished());
+    }
+  }, [availableJumpToHighlight]);
+
+  // Runs once: Check if we need to scroll to a chapter, and effects this jump
+  // useEffect(() => {
+  //   if (userWorkInfo) {
+  //     if (!availableJumpToHighlight && userWorkInfo.lastPausedPosition) {
+  //       dispatch(
+  //         setScroll({
+  //           chapterId: userWorkInfo.lastPausedPosition.chapterId,
+  //           scrollPercentage: userWorkInfo.lastPausedPosition.scrollPosition,
+  //         }),
+  //       );
+  //       dispatch(jumpToChapter(userWorkInfo.lastPausedPosition.chapterId));
+  //     }
+  //   }
+  // }, [availableJumpToHighlight, dispatch, userWorkInfo]);
+
+
+
 
   useRegisterChaptersInMenu(
     work?.chapters.map((chapter) => ({
