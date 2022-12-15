@@ -41,7 +41,7 @@ AlgoParameters) {
     return bioText(token, idConfig, algoParameters as AlgoParameters);
   });
 
-  return bionified.join('');
+  return bionified.join('')+'<span class="dom-check-tag"></span>';
 }
 
 export function bioText(text: string, idConfig: IdConfig, algoParameters: AlgoParameters) {

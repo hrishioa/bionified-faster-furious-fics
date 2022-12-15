@@ -9,6 +9,7 @@ import { TiTickOutline } from 'react-icons/ti';
 import toast from 'react-hot-toast';
 import {
   deleteHighlight,
+  requestJumpToHighlight,
   saveHighlight,
   selectSavedHighlight,
 } from './Redux-Store/HighlightSlice';
@@ -203,7 +204,8 @@ const Toolbar = () => {
             data-tooltip="Next"
             onClick={() =>
               highlightInfo.nextId !== undefined &&
-              dispatch(selectSavedHighlight(highlightInfo.nextId))
+              dispatch(requestJumpToHighlight(highlightInfo.nextId))
+              // dispatch(selectSavedHighlight(highlightInfo.nextId))
             }
           >
             <AiOutlineArrowDown className="highlight-toolbar-icon" />

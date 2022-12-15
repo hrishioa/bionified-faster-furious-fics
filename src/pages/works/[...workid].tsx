@@ -1,5 +1,6 @@
 import { MemoizedChapter } from '@/components/Chapter';
 import useRegisterChaptersInMenu from '@/components/CommandBar/SubMenus/useRegisterChaptersInMenu';
+import useJumpToHighlight from '@/components/CommandBar/SubMenus/useJumpToHighlight';
 import { RootState } from '@/components/Redux-Store/ReduxStore';
 import {
   jumpToChapter,
@@ -241,16 +242,6 @@ const WorkPage = (props: {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
 
-  // Runs when there is an available highlight to jump to, actually jumps to this highlight position.
-  useEffect(() => {
-    if (availableJumpToHighlight) {
-      console.log('Highlight is not available to jump to ',availableJumpToHighlight,', jumping');
-      dispatch(jumpToChapter(availableJumpToHighlight.chapterId));
-      dispatch(selectSavedHighlight(availableJumpToHighlight.id));
-      dispatch(highlightJumpFinished());
-    }
-  }, [availableJumpToHighlight]);
-
   // Runs once: Check if we need to scroll to a chapter, and effects this jump
   // useEffect(() => {
   //   if (userWorkInfo) {
@@ -267,7 +258,7 @@ const WorkPage = (props: {
   // }, [availableJumpToHighlight, dispatch, userWorkInfo]);
 
 
-
+  useJumpToHighlight();
 
   useRegisterChaptersInMenu(
     work?.chapters.map((chapter) => ({
@@ -277,6 +268,10 @@ const WorkPage = (props: {
     })) || [],
     work?.chapters.length || 0,
   );
+
+  useEffect(() => {
+    (window as any).selectSavedHighlight = (id: number) => dispatch(selectSavedHighlight(id));
+  }, [selectSavedHighlight]);
 
   return (
     <>

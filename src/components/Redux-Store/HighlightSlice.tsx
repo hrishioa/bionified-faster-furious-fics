@@ -78,7 +78,12 @@ const highlightSlice = createSlice({
       }
     },
     saveHighlight: (state, action: PayloadAction<Highlight>) => {
-      state.highlights[action.payload.id] = action.payload;
+      state.highlights[action.payload.id] = {
+        ...action.payload,
+        ...{
+          createdAt: new Date().toISOString()
+        }
+      };
       updateGlobalSavedHighlights(state.highlights);
     },
     deleteHighlight: (state, action: PayloadAction<Highlight>) => {
@@ -118,6 +123,7 @@ const highlightSlice = createSlice({
         state.jumpToHighlight?.requested &&
         state.highlights[state.jumpToHighlight.requested]
       ) {
+        console.log('Highlight requested is now available...');
         state.jumpToHighlight = {
           requested: state.jumpToHighlight.requested,
           availableHighlight: state.highlights[state.jumpToHighlight.requested],

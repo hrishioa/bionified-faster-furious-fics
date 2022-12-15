@@ -31,6 +31,7 @@ export type Highlight = {
   startTag: number;
   endTag: number;
   note: string;
+  createdAt?: string;
 };
 
 export type FicLoadError = {
